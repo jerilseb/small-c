@@ -1,8 +1,8 @@
-parser: expr.c interp.c main.c scan.c tree.c
+compiler: cg.c expr.c gen.c interp.c main.c scan.c tree.c
 	@cc -o $@ -g $^
 
-run: parser
-	@./parser input01
+run: compiler
+	@./compiler input01
 
 clean:
-	@rm -f parser *.o
+	@rm -f compiler out *.o *.s
