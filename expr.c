@@ -39,30 +39,78 @@ int arithop(int tok) {
   }
 }
 
+struct ASTnode *additive_expr(void);
 
-// Return an AST tree whose root is a binary operator
-struct ASTnode *binexpr(void) {
-  struct ASTnode *n, *left, *right;
-  int nodetype;
+// Return an AST tree whose root is a '*' or '/' binary operator
+struct ASTnode *multiplicative_expr(void) {
+  struct ASTnode *left, *right;
+  int tokentype;
 
   // Get the integer literal on the left.
   // Fetch the next token at the same time.
   left = primary();
 
   // If no tokens left, return just the left node
-  if (Token.token == T_EOF)
+  tokentype = Token.token;
+  if (tokentype == T_EOF)
     return (left);
 
-  // Convert the token into a node type
-  nodetype = arithop(Token.token);
+  // While the token is a '*' or '/'
+  while ((tokentype == T_STAR) || (tokentype == T_SLASH)) {
+    // Fetch in the next integer literal
+    scan(&Token);
+    right = primary();
 
-  // Get the next token in
-  scan(&Token);
+    // Join that with the left integer literal
+    left = mkastnode(arithop(tokentype), left, right, 0);
 
-  // Recursively get the right-hand tree
-  right = binexpr();
+    // Update the details of the current token.
+    // If no tokens left, return just the left node
+    tokentype = Token.token;
+    if (tokentype == T_EOF)
+      break;
+  }
 
-  // Now build a tree with both sub-trees
-  n = mkastnode(nodetype, left, right, 0);
-  return (n);
+  // Return whatever tree we have created
+  return (left);
+}
+
+// Return an AST tree whose root is a '+' or '-' binary operator
+struct ASTnode *additive_expr(void) {
+  struct ASTnode *left, *right;
+  int tokentype;
+
+  // Get the left sub-tree at a higher precedence than us
+  left = multiplicative_expr();
+
+  // If no tokens left, return just the left node
+  tokentype = Token.token;
+  if (tokentype == T_EOF)
+    return (left);
+
+  // Cache the '+' or '-' token type
+
+  // Loop working on token at our level of precedence
+  while (1) {
+    // Fetch in the next integer literal
+    scan(&Token);
+
+    // Get the right sub-tree at a higher precedence than us
+    right = multiplicative_expr();
+
+    // Join the two sub-trees with our low-precedence operator
+    left = mkastnode(arithop(tokentype), left, right, 0);
+
+    // And get the next token at our precedence
+    tokentype = Token.token;
+    if (tokentype == T_EOF)
+      break;
+  }
+
+  // Return whatever tree we have created
+  return (left);
+}
+
+struct ASTnode *binexpr() {
+  return (additive_expr());
 }
