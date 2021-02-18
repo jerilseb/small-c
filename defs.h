@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#define TEXTLEN 512 // Length of symbols in input
 
 // Tokens
 enum
@@ -12,7 +13,9 @@ enum
     T_MINUS,
     T_STAR,
     T_SLASH,
-    T_INTLIT
+    T_INTLIT,
+    T_SEMI,
+    T_PRINT
 };
 
 // Token structure
