@@ -11,15 +11,13 @@ struct ASTnode *mkastnode(int op, struct ASTnode *left,
     // Malloc a new ASTnode
     n = (struct ASTnode *)malloc(sizeof(struct ASTnode));
     if (n == NULL)
-    {
-        fprintf(stderr, "Unable to malloc in mkastnode()\n");
-        exit(1);
-    }
+        fatal("Unable to malloc in mkastnode()");
+
     // Copy in the field values and return it
     n->op = op;
     n->left = left;
     n->right = right;
-    n->intvalue = intvalue;
+    n->v.intvalue = intvalue;
     return (n);
 }
 

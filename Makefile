@@ -1,4 +1,4 @@
-compiler: cg.c expr.c gen.c main.c misc.c scan.c stmt.c tree.c
+compiler: cg.c decl.c expr.c gen.c main.c misc.c scan.c stmt.c sym.c tree.c
 	@cc -o $@ -g $^
 
 compile: compiler

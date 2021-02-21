@@ -83,8 +83,7 @@ static int scanident(int c, char *buf, int lim)
         // else append to buf[] and get next character
         if (lim - 1 == i)
         {
-            printf("identifier too long on line %d\n", Line);
-            exit(1);
+            fatal("Identifier too long");
         }
         else if (i < lim - 1)
         {
@@ -107,6 +106,10 @@ static int keyword(char *s)
 {
     switch (*s)
     {
+    case 'i':
+        if (!strcmp(s, "int"))
+            return (T_INT);
+        break;
     case 'p':
         if (!strcmp(s, "print"))
             return (T_PRINT);
@@ -146,6 +149,9 @@ int scan(struct token *t)
     case ';':
         t->token = T_SEMI;
         break;
+    case '=':
+        t->token = T_EQUALS;
+        break;
     default:
 
         // If it's a digit, scan the
@@ -167,13 +173,12 @@ int scan(struct token *t)
                 t->token = tokentype;
                 break;
             }
-            // Not a recognised keyword, so an error for now
-            printf("Unrecognised symbol %s on line %d\n", Text, Line);
-            exit(1);
+            // Not a recognised keyword, so it must be an identifier
+            t->token = T_IDENT;
+            break;
         }
         // The character isn't part of any recognised token, error
-        printf("Unrecognised character %c on line %d\n", c, Line);
-        exit(1);
+        fatalc("Unrecognised character", c);
     }
 
     // We found a token
