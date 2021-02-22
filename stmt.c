@@ -3,10 +3,15 @@
 #include "decl.h"
 
 // statements: statement
-//      | statement statements
+//      |      statement statements
 //      ;
 //
 // statement: 'print' expression ';'
+//      |     'int'   identifier ';'
+//      |     identifier '=' expression ';'
+//      ;
+//
+// identifier: T_IDENT
 //      ;
 
 void print_statement(void)
@@ -44,7 +49,7 @@ void assignment_statement(void)
     right = mkastleaf(A_LVIDENT, id);
 
     // Ensure we have an equals sign
-    match(T_EQUALS, "=");
+    match(T_ASSIGN, "=");
 
     // Parse the following expression
     left = binexpr(0);

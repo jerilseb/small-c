@@ -14,9 +14,15 @@ enum
     T_MINUS,
     T_STAR,
     T_SLASH,
+    T_EQ,
+    T_NE,
+    T_LT,
+    T_GT,
+    T_LE,
+    T_GE,
     T_INTLIT,
     T_SEMI,
-    T_EQUALS,
+    T_ASSIGN,
     T_IDENT,
     // Keywords
     T_PRINT,
@@ -26,17 +32,24 @@ enum
 // Token structure
 struct token
 {
-    int token;
-    int intvalue;
+    int token;    // Token type, from the enum list above
+    int intvalue; // For T_INTLIT, the integer value
 };
 
-// AST node types
+// AST node types. The first few line up
+// with the related tokens
 enum
 {
-    A_ADD,
+    A_ADD = 1,
     A_SUBTRACT,
     A_MULTIPLY,
     A_DIVIDE,
+    A_EQ,
+    A_NE,
+    A_LT,
+    A_GT,
+    A_LE,
+    A_GE,
     A_INTLIT,
     A_IDENT,
     A_LVIDENT,
