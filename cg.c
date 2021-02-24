@@ -97,7 +97,7 @@ int cgloadglob(int id)
         break;
     case P_INT:
         fprintf(Outfile, "\tmovzbl\t%s(\%%rip), %s\n", Gsym[id].name,
-                reglist[r]);
+                dreglist[r]);
         break;
     case P_LONG:
         fprintf(Outfile, "\tmovq\t%s(\%%rip), %s\n", Gsym[id].name, reglist[r]);
