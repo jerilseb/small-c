@@ -1,7 +1,11 @@
-void main()
-{
-    char i;
+int fred() {
+  return(20);
+}
 
-    i = 20;
-    print i;
+void main() {
+  int result;
+  printint(10);
+  result= fred(15);
+  printint(result);
+  printint(fred(15)+10);
 }

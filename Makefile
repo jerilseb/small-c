@@ -10,11 +10,11 @@ inspect: out.s
 	@objdump -s out.o
 
 run: out.s
-	@cc -o out out.s
+	@cc -o out out.s lib/printint.c
 	@./out
 
 debug: out.s
-	@cc -ggdb out.s -o out
+	@cc -ggdb out.s  lib/printint.c -o out
 	@gdb out
 
 clean:

@@ -52,8 +52,7 @@ static int skip(void)
 }
 
 // Scan and return an integer literal
-// value from the input file. Store
-// the value as a string in Text.
+// value from the input file.
 static int scanint(int c)
 {
     int k, val = 0;
@@ -124,9 +123,17 @@ static int keyword(char *s)
         if (!strcmp(s, "int"))
             return (T_INT);
         break;
+    case 'l':
+        if (!strcmp(s, "long"))
+            return (T_LONG);
+        break;
     case 'p':
         if (!strcmp(s, "print"))
             return (T_PRINT);
+        break;
+    case 'r':
+        if (!strcmp(s, "return"))
+            return (T_RETURN);
         break;
     case 'w':
         if (!strcmp(s, "while"))
@@ -140,12 +147,30 @@ static int keyword(char *s)
     return (0);
 }
 
+// A pointer to a rejected token
+static struct token *Rejtoken = NULL;
+
+// Reject the token that we just scanned
+void reject_token(struct token *t)
+{
+    if (Rejtoken != NULL)
+        fatal("Can't reject token twice");
+    Rejtoken = t;
+}
+
 // Scan and return the next token found in the input.
 // Return 1 if token valid, 0 if no tokens left.
 int scan(struct token *t)
 {
     int c, tokentype;
 
+    // If we have any rejected token, return it
+    if (Rejtoken != NULL)
+    {
+        t = Rejtoken;
+        Rejtoken = NULL;
+        return (1);
+    }
     // Skip whitespace
     c = skip();
 
