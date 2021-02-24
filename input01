@@ -2,7 +2,8 @@
     int x;
     x = 23;
 
-    if(x > 10) {
-        print x + 4;
+    while(x < 40) {
+        print x;
+        x = x + 1;
     }
 }
