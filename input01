@@ -1,9 +1,7 @@
 {
-    int x;
-    x = 23;
-
-    while(x < 40) {
-        print x;
-        x = x + 1;
-    }
+  int i;
+  i = 4;
+  for (i=12; i <= 20; i= i + 1) {
+    print i;
+  }
 }

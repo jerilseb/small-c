@@ -2,6 +2,9 @@
 #include "data.h"
 #include "decl.h"
 
+// Prototypes
+static struct ASTnode *single_statement(void);
+
 // compound_statement:          // empty, i.e. no statement
 //      |      statement
 //      |      statement statements
@@ -30,9 +33,7 @@ static struct ASTnode *print_statement(void)
     // Make an print AST tree
     tree = mkastunary(A_PRINT, tree, 0);
 
-    // Match the following semicolon
-    // and return the AST
-    semi();
+    // Return the AST
     return (tree);
 }
 
@@ -62,9 +63,7 @@ static struct ASTnode *assignment_statement(void)
     // Make an assignment AST tree
     tree = mkastnode(A_ASSIGN, left, NULL, right, 0);
 
-    // Match the following semicolon
-    // and return the AST
-    semi();
+    // Return the AST
     return (tree);
 }
 
@@ -77,7 +76,7 @@ static struct ASTnode *assignment_statement(void)
 // Parse an IF statement including
 // any optional ELSE clause
 // and return its AST
-struct ASTnode *if_statement(void)
+static struct ASTnode *if_statement(void)
 {
     struct ASTnode *condAST, *trueAST, *falseAST = NULL;
 
@@ -111,7 +110,7 @@ struct ASTnode *if_statement(void)
 //
 // Parse a WHILE statement
 // and return its AST
-struct ASTnode *while_statement(void)
+static struct ASTnode *while_statement(void)
 {
     struct ASTnode *condAST, *bodyAST;
 
@@ -134,6 +133,79 @@ struct ASTnode *while_statement(void)
     return (mkastnode(A_WHILE, condAST, NULL, bodyAST, 0));
 }
 
+// for_statement: 'for' '(' preop_statement ';'
+//                          true_false_expression ';'
+//                          postop_statement ')' compound_statement  ;
+//
+// preop_statement:  statement          (for now)
+// postop_statement: statement          (for now)
+//
+// Parse a FOR statement
+// and return its AST
+static struct ASTnode *for_statement(void)
+{
+    struct ASTnode *condAST, *bodyAST;
+    struct ASTnode *preopAST, *postopAST;
+    struct ASTnode *tree;
+
+    // Ensure we have 'for' '('
+    match(T_FOR, "for");
+    lparen();
+
+    // Get the pre_op statement and the ';'
+    preopAST = single_statement();
+    semi();
+
+    // Get the condition and the ';'
+    condAST = binexpr(0);
+    if (condAST->op < A_EQ || condAST->op > A_GE)
+        fatal("Bad comparison operator");
+    semi();
+
+    // Get the post_op statement and the ')'
+    postopAST = single_statement();
+    rparen();
+
+    // Get the compound statement which is the body
+    bodyAST = compound_statement();
+
+    // For now, all four sub-trees have to be non-NULL.
+    // Later on, we'll change the semantics for when some are missing
+
+    // Glue the compound statement and the postop tree
+    tree = mkastnode(A_GLUE, bodyAST, NULL, postopAST, 0);
+
+    // Make a WHILE loop with the condition and this new body
+    tree = mkastnode(A_WHILE, condAST, NULL, tree, 0);
+
+    // And glue the preop tree to the A_WHILE tree
+    return (mkastnode(A_GLUE, preopAST, NULL, tree, 0));
+}
+
+// Parse a single statement
+// and return its AST
+static struct ASTnode *single_statement(void)
+{
+    switch (Token.token)
+    {
+    case T_PRINT:
+        return (print_statement());
+    case T_INT:
+        var_declaration();
+        return (NULL); // No AST generated here
+    case T_IDENT:
+        return (assignment_statement());
+    case T_IF:
+        return (if_statement());
+    case T_WHILE:
+        return (while_statement());
+    case T_FOR:
+        return (for_statement());
+    default:
+        fatald("Syntax error, token", Token.token);
+    }
+}
+
 // Parse a compound statement
 // and return its AST
 struct ASTnode *compound_statement(void)
@@ -146,42 +218,29 @@ struct ASTnode *compound_statement(void)
 
     while (1)
     {
-        switch (Token.token)
-        {
-        case T_PRINT:
-            tree = print_statement();
-            break;
-        case T_INT:
-            var_declaration();
-            tree = NULL; // No AST generated here
-            break;
-        case T_IDENT:
-            tree = assignment_statement();
-            break;
-        case T_IF:
-            tree = if_statement();
-            break;
-        case T_WHILE:
-            tree = while_statement();
-            break;
-        case T_RBRACE:
-            // When we hit a right curly bracket,
-            // skip past it and return the AST
-            rbrace();
-            return (left);
-        default:
-            fatald("Syntax error, token", Token.token);
-        }
+        // Parse a single statement
+        tree = single_statement();
+
+        // Some statements must be followed by a semicolon
+        if (tree != NULL && (tree->op == A_PRINT || tree->op == A_ASSIGN))
+            semi();
 
         // For each new tree, either save it in left
         // if left is empty, or glue the left and the
         // new tree together
-        if (tree)
+        if (tree != NULL)
         {
             if (left == NULL)
                 left = tree;
             else
                 left = mkastnode(A_GLUE, left, NULL, tree, 0);
+        }
+        // When we hit a right curly bracket,
+        // skip past it and return the AST
+        if (Token.token == T_RBRACE)
+        {
+            rbrace();
+            return (left);
         }
     }
 }
