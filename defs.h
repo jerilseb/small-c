@@ -35,6 +35,8 @@ enum
     T_RBRACE,
     T_LPAREN,
     T_RPAREN,
+    T_AMPER,
+    T_LOGAND,
     // Other keywords
     T_PRINT,
     T_IF,
@@ -76,7 +78,9 @@ enum
     A_FUNCTION,
     A_WIDEN,
     A_RETURN,
-    A_FUNCCALL
+    A_FUNCCALL,
+    A_DEREF,
+    A_ADDR
 };
 
 // Primitive types
@@ -86,7 +90,11 @@ enum
     P_VOID,
     P_CHAR,
     P_INT,
-    P_LONG
+    P_LONG,
+    P_VOIDPTR,
+    P_CHARPTR,
+    P_INTPTR,
+    P_LONGPTR
 };
 
 // Abstract Syntax Tree structure

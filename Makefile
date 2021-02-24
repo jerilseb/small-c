@@ -1,8 +1,8 @@
 compiler: cg.c decl.c expr.c gen.c main.c misc.c scan.c stmt.c sym.c tree.c types.c
 	@cc -o $@ -g $^
 
-out.s: compiler
-	@./compiler input01
+out.s: compiler test/input.c
+	@./compiler test/input.c
 
 inspect: out.s
 	@cc -c -o out.o out.s
@@ -13,7 +13,7 @@ run: out.s
 	@cc -o out out.s lib/printint.c
 	@./out
 
-debug: out.s
+debug: out.s lib/printint.c
 	@cc -ggdb out.s  lib/printint.c -o out
 	@gdb out
 

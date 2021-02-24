@@ -2,19 +2,42 @@
 #include "data.h"
 #include "decl.h"
 
-// Parse the current token and
-// return a primitive type enum value
-int parse_type(int t)
+// Parse the current token and return
+// a primitive type enum value. Also
+// scan in the next token
+int parse_type(void)
 {
-    if (t == T_CHAR)
-        return (P_CHAR);
-    if (t == T_INT)
-        return (P_INT);
-    if (t == T_LONG)
-        return (P_LONG);
-    if (t == T_VOID)
-        return (P_VOID);
-    fatald("Illegal type, token", t);
+    int type;
+    switch (Token.token)
+    {
+    case T_VOID:
+        type = P_VOID;
+        break;
+    case T_CHAR:
+        type = P_CHAR;
+        break;
+    case T_INT:
+        type = P_INT;
+        break;
+    case T_LONG:
+        type = P_LONG;
+        break;
+    default:
+        fatald("Illegal type, token", Token.token);
+    }
+
+    // Scan in one or more further '*' tokens
+    // and determine the correct pointer type
+    while (1)
+    {
+        scan(&Token);
+        if (Token.token != T_STAR)
+            break;
+        type = pointer_to(type);
+    }
+
+    // We leave with the next token already scanned
+    return (type);
 }
 
 // variable_declaration: type identifier ';'  ;
@@ -24,9 +47,9 @@ void var_declaration(void)
 {
     int id, type;
 
-    // Get the type of the variable, then the identifier
-    type = parse_type(Token.token);
-    scan(&Token);
+    // Get the type of the variable
+    // which also scans in the identifier
+    type = parse_type();
     ident();
     // Text now has the identifier's name.
     // Add it as a known identifier
@@ -46,9 +69,9 @@ struct ASTnode *function_declaration(void)
     struct ASTnode *tree, *finalstmt;
     int nameslot, type, endlabel;
 
-    // Get the type of the variable, then the identifier
-    type = parse_type(Token.token);
-    scan(&Token);
+    // Get the type of the variable
+    // which also scans in the identifier
+    type = parse_type();
     ident();
 
     // Get a label-id for the end label, add the function
@@ -65,11 +88,16 @@ struct ASTnode *function_declaration(void)
     // Get the AST tree for the compound statement
     tree = compound_statement();
 
-    // If the function type isn't P_VOID, check that
-    // the last AST operation in the compound statement
-    // was a return statement
+    // If the function type isn't P_VOID ..
     if (type != P_VOID)
     {
+
+        // Error if no statements in the function
+        if (tree == NULL)
+            fatal("No statements in function with non-void type");
+
+        // Check that the last AST operation in the
+        // compound statement was a return statement
         finalstmt = (tree->op == A_GLUE) ? tree->right : tree;
         if (finalstmt == NULL || finalstmt->op != A_RETURN)
             fatal("No return for function with non-void type");
