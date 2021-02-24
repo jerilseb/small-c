@@ -1,3 +1,8 @@
-int value;
-value = 22;
-print value + 33 + 3 > 2;
+{
+    int x;
+    x = 23;
+
+    if(x > 10) {
+        print x + 4;
+    }
+}

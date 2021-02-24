@@ -21,13 +21,13 @@ static int next(void)
     {                // Use the character put
         c = Putback; // back if there is one
         Putback = 0;
-        return c;
+        return (c);
     }
 
     c = fgetc(Infile); // Read from input file
     if ('\n' == c)
         Line++; // Increment line count
-    return c;
+    return (c);
 }
 
 // Put back an unwanted character
@@ -67,7 +67,7 @@ static int scanint(int c)
 
     // We hit a non-integer character, put it back.
     putback(c);
-    return val;
+    return (val);
 }
 
 // Scan an identifier from the input file and
@@ -106,7 +106,13 @@ static int keyword(char *s)
 {
     switch (*s)
     {
+    case 'e':
+        if (!strcmp(s, "else"))
+            return (T_ELSE);
+        break;
     case 'i':
+        if (!strcmp(s, "if"))
+            return (T_IF);
         if (!strcmp(s, "int"))
             return (T_INT);
         break;
@@ -148,6 +154,18 @@ int scan(struct token *t)
         break;
     case ';':
         t->token = T_SEMI;
+        break;
+    case '{':
+        t->token = T_LBRACE;
+        break;
+    case '}':
+        t->token = T_RBRACE;
+        break;
+    case '(':
+        t->token = T_LPAREN;
+        break;
+    case ')':
+        t->token = T_RPAREN;
         break;
     case '=':
         if ((c = next()) == '=')
