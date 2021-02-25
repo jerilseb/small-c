@@ -1,22 +1,9 @@
-int main()
-{
-    char a;
-    char *b;
-    char c;
-    int d;
-    int *e;
-    int f;
+int main() {
+  int x; int y;
+  int *iptr;
+  x= 10; y= 20;
+  iptr= &x + 4;
+  printint( *iptr);
 
-    a = 18;
-    printint(a);
-    b = &a;
-    c = *b;
-    printint(c);
-
-    d = 12;
-    printint(d);
-    e = &d;
-    f = *e;
-    printint(f);
-    return (0);
+  return(0);
 }

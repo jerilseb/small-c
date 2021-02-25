@@ -326,7 +326,7 @@ int cgderef(int r, int type)
         fprintf(Outfile, "\tmovzbq\t(%s), %s\n", reglist[r], reglist[r]);
         break;
     case P_INTPTR:
-        fprintf(Outfile, "\tmovq\t(%s), %s\n", reglist[r], reglist[r]);
+        fprintf(Outfile, "\tmovl\t(%s), %s\n", reglist[r], dreglist[r]);
         break;
     case P_LONGPTR:
         fprintf(Outfile, "\tmovq\t(%s), %s\n", reglist[r], reglist[r]);

@@ -14,7 +14,7 @@ run: out.s
 	@./out
 
 debug: out.s lib/printint.c
-	@cc -ggdb out.s  lib/printint.c -o out
+	@cc -ggdb out.s lib/printint.c -o out
 	@gdb out
 
 clean:
