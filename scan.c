@@ -208,6 +208,9 @@ int scan(struct token *t)
     case ')':
         t->token = T_RPAREN;
         break;
+    case ',':
+        t->token = T_COMMA;
+        break;
     case '=':
         if ((c = next()) == '=')
         {

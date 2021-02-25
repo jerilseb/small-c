@@ -26,7 +26,6 @@ static struct ASTnode *print_statement(void)
 {
     struct ASTnode *tree;
     int lefttype, righttype;
-    int reg;
 
     // Match a 'print' as the first token
     match(T_PRINT, "print");
@@ -249,10 +248,11 @@ static struct ASTnode *return_statement(void)
     return (tree);
 }
 
-// Parse a single statement
-// and return its AST
+// Parse a single statement and return its AST
 static struct ASTnode *single_statement(void)
 {
+    int type;
+
     switch (Token.token)
     {
     case T_PRINT:
@@ -260,7 +260,14 @@ static struct ASTnode *single_statement(void)
     case T_CHAR:
     case T_INT:
     case T_LONG:
-        var_declaration();
+
+        // The beginning of a variable declaration.
+        // Parse the type and get the identifier.
+        // Then parse the rest of the declaration.
+        // XXX: These are globals at present.
+        type = parse_type();
+        ident();
+        var_declaration(type);
         return (NULL); // No AST generated here
     case T_IDENT:
         return (assignment_statement());
@@ -275,6 +282,7 @@ static struct ASTnode *single_statement(void)
     default:
         fatald("Syntax error, token", Token.token);
     }
+    return (NULL); // Keep -Wall happy
 }
 
 // Parse a compound statement

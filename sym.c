@@ -2,8 +2,6 @@
 #include "data.h"
 #include "decl.h"
 
-static int Globs = 0; // Position of next free global symbol slot
-
 // Determine if the symbol s is in the global symbol table.
 // Return its slot position or -1 if not found.
 int findglob(char *s)

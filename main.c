@@ -10,6 +10,7 @@ static void init()
 {
     Line = 1;
     Putback = '\n';
+    Globs = 0;
 }
 
 // Print out a usage if started incorrectly
@@ -22,9 +23,8 @@ static void usage(char *prog)
 // Main program: check arguments and print a usage
 // if we don't have an argument. Open up the input
 // file and call scanfile() to scan the tokens in it.
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-    struct ASTnode *tree;
 
     if (argc != 2)
         usage(argv[0]);
@@ -43,19 +43,13 @@ void main(int argc, char *argv[])
         fprintf(stderr, "Unable to create out.s: %s\n", strerror(errno));
         exit(1);
     }
-
     // For now, ensure that void printint() is defined
     addglob("printint", P_CHAR, S_FUNCTION, 0);
 
-    scan(&Token);  // Get the first token from the input
-    genpreamble(); // Output the preamble
-    while (1)
-    { // Parse a function and
-        tree = function_declaration();
-        genAST(tree, NOREG, 0);   // generate the assembly code for it
-        if (Token.token == T_EOF) // Stop when we have reached EOF
-            break;
-    }
-    fclose(Outfile); // Close the output file and exit
-    exit(0);
+    scan(&Token);          // Get the first token from the input
+    genpreamble();         // Output the preamble
+    global_declarations(); // Parse the global declarations
+    genpostamble();        // Output the postamble
+    fclose(Outfile);       // Close the output file and exit
+    return (0);
 }
