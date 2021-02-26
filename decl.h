@@ -18,7 +18,6 @@ int genAST(struct ASTnode *n, int reg, int parentASTop);
 void genpreamble();
 void genpostamble();
 void genfreeregs();
-void genprintint(int reg);
 void genglobsym(int id);
 int genprimsize(int type);
 void genreturn(int reg, int id);
@@ -36,7 +35,6 @@ int cgsub(int r1, int r2);
 int cgmul(int r1, int r2);
 int cgdiv(int r1, int r2);
 int cgshlconst(int r, int val);
-void cgprintint(int r);
 int cgcall(int r, int id);
 int cgstorglob(int r, int id);
 void cgglobsym(int id);
@@ -52,7 +50,6 @@ int cgderef(int r, int type);
 int cgstorderef(int r1, int r2, int type);
 
 // expr.c
-struct ASTnode *funccall(void);
 struct ASTnode *binexpr(int ptp);
 
 // stmt.c
@@ -73,7 +70,7 @@ void fatalc(char *s, int c);
 
 // sym.c
 int findglob(char *s);
-int addglob(char *name, int type, int stype, int endlabel);
+int addglob(char *name, int type, int stype, int endlabel, int size);
 
 // decl.c
 void var_declaration(int type);
@@ -81,6 +78,7 @@ struct ASTnode *function_declaration(int type);
 void global_declarations(void);
 
 // types.c
+int inttype(int type);
 int parse_type(void);
 int pointer_to(int type);
 int value_at(int type);

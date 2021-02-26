@@ -178,9 +178,10 @@ int cgcall(int r, int id)
 }
 
 // Shift a register left by a constant
-int cgshlconst(int r, int val) {
-  fprintf(Outfile, "\tsalq\t$%d, %s\n", val, reglist[r]);
-  return(r);
+int cgshlconst(int r, int val)
+{
+    fprintf(Outfile, "\tsalq\t$%d, %s\n", val, reglist[r]);
+    return (r);
 }
 
 // Store a register's value into a variable
@@ -229,7 +230,30 @@ void cgglobsym(int id)
     // Get the size of the type
     typesize = cgprimsize(Gsym[id].type);
 
-    fprintf(Outfile, "\t.comm\t%s,%d,%d\n", Gsym[id].name, typesize, typesize);
+    // Generate the global identity and the label
+    fprintf(Outfile, "\t.data\n"
+                     "\t.globl\t%s\n",
+            Gsym[id].name);
+    fprintf(Outfile, "%s:", Gsym[id].name);
+
+    // Generate the space
+    for (int i = 0; i < Gsym[id].size; i++)
+    {
+        switch (typesize)
+        {
+        case 1:
+            fprintf(Outfile, "\t.byte\t0\n");
+            break;
+        case 4:
+            fprintf(Outfile, "\t.long\t0\n");
+            break;
+        case 8:
+            fprintf(Outfile, "\t.quad\t0\n");
+            break;
+        default:
+            fatald("Unknown typesize in cgglobsym: ", typesize);
+        }
+    }
 }
 
 // List of comparison instructions,
@@ -342,19 +366,21 @@ int cgderef(int r, int type)
 }
 
 // Store through a dereferenced pointer
-int cgstorderef(int r1, int r2, int type) {
-  switch (type) {
+int cgstorderef(int r1, int r2, int type)
+{
+    switch (type)
+    {
     case P_CHAR:
-      fprintf(Outfile, "\tmovb\t%s, (%s)\n", breglist[r1], reglist[r2]);
-      break;
+        fprintf(Outfile, "\tmovb\t%s, (%s)\n", breglist[r1], reglist[r2]);
+        break;
     case P_INT:
-      fprintf(Outfile, "\tmovq\t%s, (%s)\n", reglist[r1], reglist[r2]);
-      break;
+        fprintf(Outfile, "\tmovq\t%s, (%s)\n", reglist[r1], reglist[r2]);
+        break;
     case P_LONG:
-      fprintf(Outfile, "\tmovq\t%s, (%s)\n", reglist[r1], reglist[r2]);
-      break;
+        fprintf(Outfile, "\tmovq\t%s, (%s)\n", reglist[r1], reglist[r2]);
+        break;
     default:
-      fatald("Can't cgstoderef on type:", type);
-  }
-  return (r1);
+        fatald("Can't cgstoderef on type:", type);
+    }
+    return (r1);
 }

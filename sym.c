@@ -27,10 +27,13 @@ static int newglob(void)
     return (p);
 }
 
-// Add a global symbol to the symbol table.
-// Also set up its type and structural type.
+// Add a global symbol to the symbol table. Set up its:
+// + type: char, int etc.
+// + structural type: var, function, array etc.
+// + size: number of elements
+// + endlabel: if this is a function
 // Return the slot number in the symbol table
-int addglob(char *name, int type, int stype, int endlabel)
+int addglob(char *name, int type, int stype, int endlabel, int size)
 {
     int y;
 
@@ -45,5 +48,6 @@ int addglob(char *name, int type, int stype, int endlabel)
     Gsym[y].type = type;
     Gsym[y].stype = stype;
     Gsym[y].endlabel = endlabel;
+    Gsym[y].size = size;
     return (y);
 }
