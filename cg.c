@@ -340,3 +340,21 @@ int cgderef(int r, int type)
     }
     return (r);
 }
+
+// Store through a dereferenced pointer
+int cgstorderef(int r1, int r2, int type) {
+  switch (type) {
+    case P_CHAR:
+      fprintf(Outfile, "\tmovb\t%s, (%s)\n", breglist[r1], reglist[r2]);
+      break;
+    case P_INT:
+      fprintf(Outfile, "\tmovq\t%s, (%s)\n", reglist[r1], reglist[r2]);
+      break;
+    case P_LONG:
+      fprintf(Outfile, "\tmovq\t%s, (%s)\n", reglist[r1], reglist[r2]);
+      break;
+    default:
+      fatald("Can't cgstoderef on type:", type);
+  }
+  return (r1);
+}

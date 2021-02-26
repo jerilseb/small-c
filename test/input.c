@@ -1,15 +1,18 @@
-int c, d;
-int *e;
-int f;
+int c;
+int x;
+int *d;
 
-int main()
+
+int test() {
+    int value;
+    value = 33;
+    return (value + 3);
+}
+
+void main()
 {
-    c = 12;
-    d = 18;
-
-    e = &c + 1;
-    f = *e;
-    printint(f);
-
-    return (0);
+    x = c = 84*2;
+    d = &c;
+    *d = 99;
+    printint(x);
 }

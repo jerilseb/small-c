@@ -11,6 +11,7 @@ enum
 {
     T_EOF,
     // Operators
+    T_ASSIGN,
     T_PLUS,
     T_MINUS,
     T_STAR,
@@ -29,7 +30,6 @@ enum
     // Structural tokens
     T_INTLIT,
     T_SEMI,
-    T_ASSIGN,
     T_IDENT,
     T_LBRACE,
     T_RBRACE,
@@ -37,9 +37,7 @@ enum
     T_RPAREN,
     T_AMPER,
     T_LOGAND,
-    T_COMMA,
     // Other keywords
-    T_PRINT,
     T_IF,
     T_ELSE,
     T_WHILE,
@@ -58,7 +56,8 @@ struct token
 // with the related tokens
 enum
 {
-    A_ADD = 1,
+    A_ASSIGN = 1,
+    A_ADD,
     A_SUBTRACT,
     A_MULTIPLY,
     A_DIVIDE,
@@ -67,17 +66,14 @@ enum
     A_LT,
     A_GT,
     A_LE,
-    A_GE, // 10
+    A_GE,
     A_INTLIT,
     A_IDENT,
-    A_LVIDENT,
-    A_ASSIGN,
-    A_PRINT,
     A_GLUE,
     A_IF,
     A_WHILE,
     A_FUNCTION,
-    A_WIDEN, // 20
+    A_WIDEN,
     A_RETURN,
     A_FUNCCALL,
     A_DEREF,
@@ -104,6 +100,7 @@ struct ASTnode
 {
     int op;               // "Operation" to be performed on this tree
     int type;             // Type of any expression this tree generates
+    int rvalue;           // True if the node is an rvalue
     struct ASTnode *left; // Left, middle and right child trees
     struct ASTnode *mid;
     struct ASTnode *right;
@@ -117,6 +114,8 @@ struct ASTnode
 
 #define NOREG -1 // Use NOREG when the AST generation
 // functions have no register to return
+#define NOLABEL 0 // Use NOLABEL when we have no label to
+// pass to genAST()
 
 // Structural types
 enum

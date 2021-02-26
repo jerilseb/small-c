@@ -5,7 +5,7 @@ compiler: $(SRCS)
 	@cc -o $@ $(SRCS)
 
 out.s: compiler test/input.c
-	@./compiler test/input.c
+	@./compiler -T test/input.c
 
 debug_build: $(SRCS)
 	@cc -ggdb -o compiler $(SRCS)
