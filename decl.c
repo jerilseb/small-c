@@ -2,25 +2,6 @@
 #include "data.h"
 #include "decl.h"
 
-// global_declarations : global_declarations
-//      | global_declaration global_declarations
-//      ;
-//
-// global_declaration: function_declaration | var_declaration ;
-//
-// function_declaration: type identifier '(' ')' compound_statement   ;
-//
-// var_declaration: type identifier_list ';'  ;
-//
-// type: type_keyword opt_pointer  ;
-//
-// type_keyword: 'void' | 'char' | 'int' | 'long'  ;
-//
-// opt_pointer: <empty> | '*' opt_pointer  ;
-//
-// identifier_list: identifier | identifier ',' identifier_list ;
-//
-
 // Parse the current token and return
 // a primitive type enum value. Also
 // scan in the next token
@@ -59,10 +40,6 @@ int parse_type(void)
     return (type);
 }
 
-// variable_declaration: type identifier ';'  ;
-//
-// Parse the declaration of a list of variables.
-// The identifier has been scanned & we have the type
 void var_declaration(int type)
 {
     int id;

@@ -67,7 +67,7 @@ enum
     A_LT,
     A_GT,
     A_LE,
-    A_GE,
+    A_GE, // 10
     A_INTLIT,
     A_IDENT,
     A_LVIDENT,
@@ -77,11 +77,12 @@ enum
     A_IF,
     A_WHILE,
     A_FUNCTION,
-    A_WIDEN,
+    A_WIDEN, // 20
     A_RETURN,
     A_FUNCCALL,
     A_DEREF,
-    A_ADDR
+    A_ADDR,
+    A_SCALE
 };
 
 // Primitive types
@@ -110,6 +111,7 @@ struct ASTnode
     {                 // For A_INTLIT, the integer value
         int intvalue; // For A_IDENT, the symbol slot number
         int id;       // For A_FUNCTION, the symbol slot number
+        int size;     // For A_SCALE, the size to scale by
     } v;              // For A_FUNCCALL, the symbol slot number
 };
 

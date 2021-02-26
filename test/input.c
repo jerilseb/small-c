@@ -1,9 +1,15 @@
-int main() {
-  int x; int y;
-  int *iptr;
-  x= 10; y= 20;
-  iptr= &x + 4;
-  printint( *iptr);
+int c, d;
+int *e;
+int f;
 
-  return(0);
+int main()
+{
+    c = 12;
+    d = 18;
+
+    e = &c + 1;
+    f = *e;
+    printint(f);
+
+    return (0);
 }
