@@ -10,23 +10,46 @@
 enum
 {
     T_EOF,
-    // Operators
+
+    // Binary operators
     T_ASSIGN,
-    T_PLUS,
-    T_MINUS,
-    T_STAR,
-    T_SLASH,
+    T_LOGOR,
+    T_LOGAND,
+    T_OR,
+    T_XOR,
+    T_AMPER,
     T_EQ,
     T_NE,
     T_LT,
     T_GT,
     T_LE,
     T_GE,
+    T_LSHIFT,
+    T_RSHIFT,
+    T_PLUS,
+    T_MINUS,
+    T_STAR,
+    T_SLASH,
+
+    // Other operators
+    T_INC,
+    T_DEC,
+    T_INVERT,
+    T_LOGNOT,
+
     // Type keywords
     T_VOID,
     T_CHAR,
     T_INT,
     T_LONG,
+
+    // Other keywords
+    T_IF,
+    T_ELSE,
+    T_WHILE,
+    T_FOR,
+    T_RETURN,
+
     // Structural tokens
     T_INTLIT,
     T_STRLIT,
@@ -37,15 +60,7 @@ enum
     T_LPAREN,
     T_RPAREN,
     T_LBRACKET,
-    T_RBRACKET,
-    T_AMPER,
-    T_LOGAND,
-    // Other keywords
-    T_IF,
-    T_ELSE,
-    T_WHILE,
-    T_FOR,
-    T_RETURN
+    T_RBRACKET
 };
 
 // Token structure
@@ -60,16 +75,23 @@ struct token
 enum
 {
     A_ASSIGN = 1,
-    A_ADD,
-    A_SUBTRACT,
-    A_MULTIPLY,
-    A_DIVIDE,
+    A_LOGOR,
+    A_LOGAND,
+    A_OR,
+    A_XOR,
+    A_AND,
     A_EQ,
     A_NE,
     A_LT,
     A_GT,
     A_LE,
     A_GE,
+    A_LSHIFT,
+    A_RSHIFT,
+    A_ADD,
+    A_SUBTRACT,
+    A_MULTIPLY,
+    A_DIVIDE,
     A_INTLIT,
     A_STRLIT,
     A_IDENT,
@@ -82,7 +104,15 @@ enum
     A_FUNCCALL,
     A_DEREF,
     A_ADDR,
-    A_SCALE
+    A_SCALE,
+    A_PREINC,
+    A_PREDEC,
+    A_POSTINC,
+    A_POSTDEC,
+    A_NEGATE,
+    A_INVERT,
+    A_LOGNOT,
+    A_TOBOOL
 };
 
 // Primitive types

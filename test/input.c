@@ -1,17 +1,13 @@
 char x;
 char *str;
 
-char test() {
-    return (x + 3);
-}
-
 int main()
 {
-    x = 'A';
-    x = test(2);
+    x = 4;
+    if (x + 1)
+    {
+        printint(x);
+    }
 
-    str = "Hello world";
-
-    printint(x);
     return (0);
 }

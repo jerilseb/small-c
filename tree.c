@@ -162,6 +162,24 @@ void dumpAST(struct ASTnode *n, int label, int level)
     case A_SCALE:
         fprintf(stdout, "A_SCALE %d\n", n->v.size);
         break;
+    case A_PREINC:
+        fprintf(stdout, "A_PREINC %s\n", Gsym[n->v.id].name);
+        break;
+    case A_PREDEC:
+        fprintf(stdout, "A_PREDEC %s\n", Gsym[n->v.id].name);
+        break;
+    case A_POSTINC:
+        fprintf(stdout, "A_POSTINC\n");
+        break;
+    case A_POSTDEC:
+        fprintf(stdout, "A_POSTDEC\n");
+        break;
+    case A_NEGATE:
+        fprintf(stdout, "A_NEGATE\n");
+        break;
+    case A_TOBOOL:
+        fprintf(stdout, "A_TOBOOL\n");
+        break;
     default:
         fatald("Unknown dumpAST operator", n->op);
     }
