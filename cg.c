@@ -104,8 +104,11 @@ int cgloadglob(int id, int op)
             fprintf(Outfile, "\tincb\t%s(\%%rip)\n", Gsym[id].name);
         if (op == A_PREDEC)
             fprintf(Outfile, "\tdecb\t%s(\%%rip)\n", Gsym[id].name);
+
+        // Set the register before/after based on pre/post increments
         fprintf(Outfile, "\tmovzbq\t%s(%%rip), %s\n", Gsym[id].name,
                 reglist[r]);
+
         if (op == A_POSTINC)
             fprintf(Outfile, "\tincb\t%s(\%%rip)\n", Gsym[id].name);
         if (op == A_POSTDEC)
@@ -116,8 +119,11 @@ int cgloadglob(int id, int op)
             fprintf(Outfile, "\tincl\t%s(\%%rip)\n", Gsym[id].name);
         if (op == A_PREDEC)
             fprintf(Outfile, "\tdecl\t%s(\%%rip)\n", Gsym[id].name);
+
+        // Set the register before/after based on pre/post increments
         fprintf(Outfile, "\tmovslq\t%s(\%%rip), %s\n", Gsym[id].name,
                 reglist[r]);
+
         if (op == A_POSTINC)
             fprintf(Outfile, "\tincl\t%s(\%%rip)\n", Gsym[id].name);
         if (op == A_POSTDEC)
@@ -131,7 +137,10 @@ int cgloadglob(int id, int op)
             fprintf(Outfile, "\tincq\t%s(\%%rip)\n", Gsym[id].name);
         if (op == A_PREDEC)
             fprintf(Outfile, "\tdecq\t%s(\%%rip)\n", Gsym[id].name);
+
+        // Set the register before/after based on pre/post increments
         fprintf(Outfile, "\tmovq\t%s(\%%rip), %s\n", Gsym[id].name, reglist[r]);
+
         if (op == A_POSTINC)
             fprintf(Outfile, "\tincq\t%s(\%%rip)\n", Gsym[id].name);
         if (op == A_POSTDEC)
