@@ -1,9 +1,9 @@
-void main()
+int main()
 {
-    int x;
-    int y[4];
-    y[2] = 43;
-    x = y[2];
+    int x[3];
+    x[0] = 44;
 
-    printint(x);
+    char *s;
+    s = "Hello world";
+    return (0);
 }

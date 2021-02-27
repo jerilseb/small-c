@@ -129,6 +129,9 @@ void dumpAST(struct ASTnode *n, int label, int level)
     case A_INTLIT:
         fprintf(stdout, "A_INTLIT %d\n", n->v.intvalue);
         break;
+    case A_STRLIT:
+        fprintf(stdout, "A_STRLIT rval label L%d\n", n->v.id);
+        break;
     case A_IDENT:
         if (n->rvalue)
             fprintf(stdout, "A_IDENT rval %s\n", Gsym[n->v.id].name);
@@ -163,17 +166,16 @@ void dumpAST(struct ASTnode *n, int label, int level)
         fatald("Unknown dumpAST operator", n->op);
     }
 
-        // General AST node handling
+    // General AST node handling
     if (n->left)
         dumpAST(n->left, NOLABEL, level + 2);
 
-    if(glueBreak == 1) {
+    if (glueBreak == 1)
+    {
         fprintf(stdout, "\n");
         // glueBreak = 0;
     }
 
     if (n->right)
         dumpAST(n->right, NOLABEL, level + 2);
-
-
 }

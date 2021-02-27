@@ -121,6 +121,8 @@ struct ASTnode *modify_type(struct ASTnode *tree, int rtype, int op)
             rsize = genprimsize(value_at(rtype));
             if (rsize > 1)
                 return (mkastunary(A_SCALE, rtype, tree, rsize));
+            else
+                return (tree); // Size 1, no need to scale
         }
     }
     // If we get here, the types are not compatible
