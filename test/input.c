@@ -1,9 +1,17 @@
+char x;
+char *str;
+
+char test() {
+    return (x + 3);
+}
+
 int main()
 {
-    int x[3];
-    x[0] = 44;
+    x = 'A';
+    x = test(2);
 
-    char *s;
-    s = "Hello world";
+    str = "Hello world";
+
+    printint(x);
     return (0);
 }
