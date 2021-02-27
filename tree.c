@@ -163,16 +163,16 @@ void dumpAST(struct ASTnode *n, int label, int level)
         fprintf(stdout, "A_SCALE %d\n", n->v.size);
         break;
     case A_PREINC:
-        fprintf(stdout, "A_PREINC %s\n", Gsym[n->v.id].name);
+        fprintf(stdout, "A_PREINC\n");
         break;
     case A_PREDEC:
-        fprintf(stdout, "A_PREDEC %s\n", Gsym[n->v.id].name);
+        fprintf(stdout, "A_PREDEC\n");
         break;
     case A_POSTINC:
-        fprintf(stdout, "A_POSTINC\n");
+        fprintf(stdout, "A_POSTINC %s\n", Gsym[n->v.id].name);
         break;
     case A_POSTDEC:
-        fprintf(stdout, "A_POSTDEC\n");
+        fprintf(stdout, "A_POSTDEC %s\n", Gsym[n->v.id].name);
         break;
     case A_NEGATE:
         fprintf(stdout, "A_NEGATE\n");
