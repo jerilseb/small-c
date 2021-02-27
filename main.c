@@ -11,6 +11,7 @@ static void init()
     Line = 1;
     Putback = '\n';
     Globs = 0;
+    Locls = NSYMBOLS - 1;
     O_dumpAST = 0;
 }
 
@@ -65,8 +66,9 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to create out.s: %s\n", strerror(errno));
         exit(1);
     }
-    // For now, ensure that void printint() is defined
-    addglob("printint", P_CHAR, S_FUNCTION, 0, 0);
+    // For now, ensure that printint() and printchar() are defined
+    addglob("printint", P_INT, S_FUNCTION, 0, 0);
+    addglob("printchar", P_VOID, S_FUNCTION, 0, 0);
 
     scan(&Token);          // Get the first token from the input
     genpreamble();         // Output the preamble

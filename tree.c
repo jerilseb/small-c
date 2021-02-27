@@ -94,7 +94,7 @@ void dumpAST(struct ASTnode *n, int label, int level)
         glueBreak = 1;
         break;
     case A_FUNCTION:
-        fprintf(stdout, "A_FUNCTION %s\n\n", Gsym[n->v.id].name);
+        fprintf(stdout, "A_FUNCTION %s\n\n", Symtable[n->v.id].name);
         break;
     case A_ADD:
         fprintf(stdout, "A_ADD\n");
@@ -134,9 +134,9 @@ void dumpAST(struct ASTnode *n, int label, int level)
         break;
     case A_IDENT:
         if (n->rvalue)
-            fprintf(stdout, "A_IDENT rval %s\n", Gsym[n->v.id].name);
+            fprintf(stdout, "A_IDENT rval %s\n", Symtable[n->v.id].name);
         else
-            fprintf(stdout, "A_IDENT %s\n", Gsym[n->v.id].name);
+            fprintf(stdout, "A_IDENT %s\n", Symtable[n->v.id].name);
         break;
     case A_ASSIGN:
         fprintf(stdout, "A_ASSIGN\n");
@@ -148,10 +148,10 @@ void dumpAST(struct ASTnode *n, int label, int level)
         fprintf(stdout, "A_RETURN\n");
         break;
     case A_FUNCCALL:
-        fprintf(stdout, "A_FUNCCALL %s\n", Gsym[n->v.id].name);
+        fprintf(stdout, "A_FUNCCALL %s\n", Symtable[n->v.id].name);
         break;
     case A_ADDR:
-        fprintf(stdout, "A_ADDR %s\n", Gsym[n->v.id].name);
+        fprintf(stdout, "A_ADDR %s\n", Symtable[n->v.id].name);
         break;
     case A_DEREF:
         if (n->rvalue)
@@ -169,13 +169,19 @@ void dumpAST(struct ASTnode *n, int label, int level)
         fprintf(stdout, "A_PREDEC\n");
         break;
     case A_POSTINC:
-        fprintf(stdout, "A_POSTINC %s\n", Gsym[n->v.id].name);
+        fprintf(stdout, "A_POSTINC %s\n", Symtable[n->v.id].name);
         break;
     case A_POSTDEC:
-        fprintf(stdout, "A_POSTDEC %s\n", Gsym[n->v.id].name);
+        fprintf(stdout, "A_POSTDEC %s\n", Symtable[n->v.id].name);
         break;
     case A_NEGATE:
         fprintf(stdout, "A_NEGATE\n");
+        break;
+    case A_INVERT:
+        fprintf(stdout, "A_INVERT\n");
+        break;
+    case A_LOGNOT:
+        fprintf(stdout, "A_LOGNOT\n");
         break;
     case A_TOBOOL:
         fprintf(stdout, "A_TOBOOL\n");

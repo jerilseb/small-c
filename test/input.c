@@ -1,14 +1,8 @@
-int x;
-int y;
-char *str;
+int main() {
+    int x;
+    x = 43;
 
-int main()
-{
-    x = 4;
-    y = -x + 3;
+    printint(x);
 
-    printint(x++);
-    printint(--y);
-
-    return (0);
+    return(0);
 }
