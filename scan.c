@@ -296,6 +296,9 @@ int scan(struct token *t)
     case '^':
         t->token = T_XOR;
         break;
+    case ',':
+        t->token = T_COMMA;
+        break;
     case '=':
         if ((c = next()) == '=')
         {

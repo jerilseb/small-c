@@ -179,10 +179,12 @@ static struct ASTnode *single_statement(void)
 
         // The beginning of a variable declaration.
         // Parse the type and get the identifier.
-        // Then parse the rest of the declaration.
+        // Then parse the rest of the declaration
+        // and skip over the semicolon
         type = parse_type();
         ident();
-        var_declaration(type, 1);
+        var_declaration(type, 1, 0);
+        semi();
         return (NULL); // No AST generated here
     case T_IF:
         return (if_statement());
