@@ -183,7 +183,7 @@ static struct ASTnode *single_statement(void)
         // and skip over the semicolon
         type = parse_type();
         ident();
-        var_declaration(type, 1, 0);
+        var_declaration(type, C_LOCAL);
         semi();
         return (NULL); // No AST generated here
     case T_IF:
