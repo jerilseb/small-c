@@ -183,7 +183,7 @@ static struct ASTnode *primary(void)
         // For a STRLIT token, generate the assembly for it.
         // Then make a leaf AST node for it. id is the string's label.
         id = genglobstr(Text);
-        n = mkastleaf(A_STRLIT, P_CHARPTR, id);
+        n = mkastleaf(A_STRLIT, pointer_to(P_CHAR), id);
         break;
 
     case T_IDENT:
@@ -406,7 +406,7 @@ struct ASTnode *binexpr(int ptp)
 
             // Ensure the right's type matches the left
             right = modify_type(right, left->type, 0);
-            if (left == NULL)
+            if (right == NULL)
                 fatal("Incompatible expression in assignment");
 
             // Make an assignment AST tree. However, switch

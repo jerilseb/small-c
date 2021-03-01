@@ -3,8 +3,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#define TEXTLEN 512   // Length of symbols in input
-#define NSYMBOLS 1024 // Number of symbol table entries
+enum
+{
+    TEXTLEN = 512,  // Length of symbols in input
+    NSYMBOLS = 1024 // Number of symbol table entries
+};
 
 // Commands and default filenames
 #define AOUT "a.out"
@@ -121,18 +124,16 @@ enum
     A_TOBOOL
 };
 
-// Primitive types
+// Primitive types. The bottom 4 bits is an integer
+// value that represents the level of indirection,
+// e.g. 0= no pointer, 1= pointer, 2= pointer pointer etc.
 enum
 {
     P_NONE,
-    P_VOID,
-    P_CHAR,
-    P_INT,
-    P_LONG,
-    P_VOIDPTR,
-    P_CHARPTR,
-    P_INTPTR,
-    P_LONGPTR
+    P_VOID = 16,
+    P_CHAR = 32,
+    P_INT = 48,
+    P_LONG = 64
 };
 
 // Abstract Syntax Tree structure
@@ -149,13 +150,16 @@ struct ASTnode
         int intvalue; // For A_IDENT, the symbol slot number
         int id;       // For A_FUNCTION, the symbol slot number
         int size;     // For A_SCALE, the size to scale by
-    } v;              // For A_FUNCCALL, the symbol slot number
+    };                // For A_FUNCCALL, the symbol slot number
 };
 
-#define NOREG -1 // Use NOREG when the AST generation
-// functions have no register to return
-#define NOLABEL 0 // Use NOLABEL when we have no label to
-// pass to genAST()
+enum
+{
+    NOREG = -1, // Use NOREG when the AST generation
+                // functions have no register to return
+    NOLABEL = 0 // Use NOLABEL when we have no label to
+    // pass to genAST()
+};
 
 // Structural types
 enum
@@ -176,14 +180,19 @@ enum
 // Symbol table structure
 struct symtable
 {
-    char *name;   // Name of a symbol
-    int type;     // Primitive type for the symbol
-    int stype;    // Structural type for the symbol
-    int class;    // Storage class for the symbol
-    int endlabel; // For S_FUNCTIONs, the end label
-    int size;     // Number of elements in the symbol
-    int posn;     // For locals, either the negative offset
-        // from stack base pointer, or register id
-#define nelems posn // For functions, # of params
-        // For structs, # of fields
+    char *name; // Name of a symbol
+    int type;   // Primitive type for the symbol
+    int stype;  // Structural type for the symbol
+    int class;  // Storage class for the symbol
+    union
+    {
+        int size;     // Number of elements in the symbol
+        int endlabel; // For functions, the end label
+    };
+    union
+    {
+        int nelems; // For functions, # of params
+        int posn;   // For locals, the negative offset
+                    // from the stack base pointer
+    };
 };
