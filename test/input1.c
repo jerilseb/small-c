@@ -1,4 +1,4 @@
-int sum(int a, int b);
+int sum(int *a, int b);
 int printf(char *fmt);
 
 int main()
@@ -7,9 +7,9 @@ int main()
     int y;
 
     x = 22;
-    y = sum(x, 33);
+    y = sum(&x, 33);
 
-    printf("Hello world, %d\n", 233);
+    printf("Hello world, %d\n", y);
 
     return (0);
 }

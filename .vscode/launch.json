@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug jcc",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/jcc",
+            "args": ["test/input1.c", "test/input2.c"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Debug Build",
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}

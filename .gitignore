@@ -1,7 +1,7 @@
-.vscode
 *.o
 *.s
 test/*.o
 test/*.s
 test/output
 jcc
+*.out
