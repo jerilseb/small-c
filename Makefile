@@ -6,10 +6,13 @@ INPUTS= test/input1.c test/input2.c
 jcc: $(SRCS)
 	@cc -o $@ $(SRCS)
 
-.PHONY: compile
+.PHONY: compile assemble run
 
 compile: jcc $(INPUTS)
 	@./jcc -S $(INPUTS)
+
+assemble: jcc $(INPUTS)
+	@./jcc -c $(INPUTS)
 
 run: jcc $(INPUTS)
 	@./jcc -o test/output $(INPUTS)
