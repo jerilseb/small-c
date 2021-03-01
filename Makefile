@@ -9,7 +9,11 @@ jcc: $(SRCS)
 .PHONY: compile
 
 compile: jcc $(INPUTS)
-	@./jcc -S -o test/output $(INPUTS)
+	@./jcc -S $(INPUTS)
+
+run: jcc $(INPUTS)
+	@./jcc -o test/output $(INPUTS)
+	@./test/output
 
 debug_build: $(SRCS)
 	@cc -ggdb -o jcc $(SRCS)

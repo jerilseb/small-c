@@ -9,7 +9,7 @@ int main()
     x = 22;
     y = sum(x, 33);
 
-    printf("Hello world, %d\n", 23);
+    printf("Hello world, %d\n", 233);
 
     return (0);
 }
