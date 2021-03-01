@@ -6,6 +6,11 @@
 #define TEXTLEN 512   // Length of symbols in input
 #define NSYMBOLS 1024 // Number of symbol table entries
 
+// Commands and default filenames
+#define AOUT "a.out"
+#define ASCMD "as -o "
+#define LDCMD "cc -o "
+
 // Token types
 enum
 {

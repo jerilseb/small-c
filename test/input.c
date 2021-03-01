@@ -1,4 +1,5 @@
 int sum(int a, int b);
+int printf(char *fmt);
 
 int main()
 {
@@ -8,11 +9,12 @@ int main()
     x = 22;
     y = sum(x, 33);
 
-    printint(y);
+    printf("Hello world, %d\n", 23);
 
     return (0);
 }
 
-int sum(int a, int b) {
-    return (a+b);
+int sum(int a, int b)
+{
+    return (a + b);
 }

@@ -1,1 +1,7 @@
 .vscode
+*.o
+*.s
+test/*.o
+test/*.s
+output
+jcc
