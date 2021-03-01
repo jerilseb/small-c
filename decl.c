@@ -127,7 +127,7 @@ static int param_declaration(int id)
         // Check that this type matches the prototype.
         if (param_id)
         {
-            if (type != Symtable[id].type)
+            if (type != Symtable[param_id].type)
                 fatald("Type doesn't match prototype for parameter", paramcnt + 1);
             param_id++;
         }
