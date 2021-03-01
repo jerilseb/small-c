@@ -3,5 +3,5 @@
 *.s
 test/*.o
 test/*.s
-output
+test/output
 jcc
