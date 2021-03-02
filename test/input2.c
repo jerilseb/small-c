@@ -1,5 +1,5 @@
-int sum(int *a, int b)
+int sum(int a, int b)
 {
-    *a = 44;
-    return (*a + b);
+    a = 44;
+    return (a + b);
 }

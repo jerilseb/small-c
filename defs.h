@@ -5,8 +5,7 @@
 
 enum
 {
-    TEXTLEN = 512,  // Length of symbols in input
-    NSYMBOLS = 1024 // Number of symbol table entries
+    TEXTLEN = 512 // Length of identifiers in input
 };
 
 // Commands and default filenames
@@ -136,31 +135,6 @@ enum
     P_LONG = 64
 };
 
-// Abstract Syntax Tree structure
-struct ASTnode
-{
-    int op;               // "Operation" to be performed on this tree
-    int type;             // Type of any expression this tree generates
-    int rvalue;           // True if the node is an rvalue
-    struct ASTnode *left; // Left, middle and right child trees
-    struct ASTnode *mid;
-    struct ASTnode *right;
-    union
-    {                 // For A_INTLIT, the integer value
-        int intvalue; // For A_IDENT, the symbol slot number
-        int id;       // For A_FUNCTION, the symbol slot number
-        int size;     // For A_SCALE, the size to scale by
-    };                // For A_FUNCCALL, the symbol slot number
-};
-
-enum
-{
-    NOREG = -1, // Use NOREG when the AST generation
-                // functions have no register to return
-    NOLABEL = 0 // Use NOLABEL when we have no label to
-    // pass to genAST()
-};
-
 // Structural types
 enum
 {
@@ -178,6 +152,7 @@ enum
 };
 
 // Symbol table structure
+// XXX Put some comments here
 struct symtable
 {
     char *name; // Name of a symbol
@@ -195,4 +170,31 @@ struct symtable
         int posn;   // For locals, the negative offset
                     // from the stack base pointer
     };
+    struct symtable *member; // First member of a function, struct,
+    struct symtable *next;   // Next symbol in one list
+};                           // union or enum
+
+// Abstract Syntax Tree structure
+struct ASTnode
+{
+    int op;               // "Operation" to be performed on this tree
+    int type;             // Type of any expression this tree generates
+    int rvalue;           // True if the node is an rvalue
+    struct ASTnode *left; // Left, middle and right child trees
+    struct ASTnode *mid;
+    struct ASTnode *right;
+    struct symtable *sym; // For many AST nodes, the pointer to
+    union
+    {                 // the symbol in the symbol table
+        int intvalue; // For A_INTLIT, the integer value
+        int size;     // For A_SCALE, the size to scale by
+    };
+};
+
+enum
+{
+    NOREG = -1, // Use NOREG when the AST generation
+    // functions have no register to return
+    NOLABEL = 0 // Use NOLABEL when we have no label to
+                // pass to genAST()
 };

@@ -104,10 +104,11 @@ void cgpostamble()
 }
 
 // Print out a function preamble
-void cgfuncpreamble(int id)
+void cgfuncpreamble(struct symtable *sym)
 {
-    char *name = Symtable[id].name;
-    int i;
+    char *name = sym->name;
+    struct symtable *parm, *locvar;
+    int cnt;
     int paramOffset = 16;         // Any pushed params start at this stack offset
     int paramReg = FIRSTPARAMREG; // Index to the first param register in above reg lists
 
@@ -124,31 +125,27 @@ void cgfuncpreamble(int id)
             "\tmovq\t%%rsp, %%rbp\n",
             name, name, name);
 
-    // Copy any in-register parameters to the stack
-    // Stop after no more than six parameter registers
-    for (i = NSYMBOLS - 1; i > Locls; i--)
+    // Copy any in-register parameters to the stack, up to six of them
+    // The remaining parameters are already on the stack
+    for (parm = sym->member, cnt = 1; parm != NULL; parm = parm->next, cnt++)
     {
-        if (Symtable[i].class != C_PARAM)
-            break;
-        if (i < NSYMBOLS - 6)
-            break;
-        Symtable[i].posn = newlocaloffset(Symtable[i].type);
-        cgstorlocal(paramReg--, i);
-    }
-
-    // For the remainder, if they are a parameter then they are
-    // already on the stack. If only a local, make a stack position.
-    for (; i > Locls; i--)
-    {
-        if (Symtable[i].class == C_PARAM)
+        if (cnt > 6)
         {
-            Symtable[i].posn = paramOffset;
+            parm->posn = paramOffset;
             paramOffset += 8;
         }
         else
         {
-            Symtable[i].posn = newlocaloffset(Symtable[i].type);
+            parm->posn = newlocaloffset(parm->type);
+            cgstorlocal(paramReg--, parm);
         }
+    }
+
+    // For the remainder, if they are a parameter then they are
+    // already on the stack. If only a local, make a stack position.
+    for (locvar = Loclhead; locvar != NULL; locvar = locvar->next)
+    {
+        locvar->posn = newlocaloffset(locvar->type);
     }
 
     // Align the stack pointer to be a multiple of 16
@@ -158,9 +155,9 @@ void cgfuncpreamble(int id)
 }
 
 // Print out a function postamble
-void cgfuncpostamble(int id)
+void cgfuncpostamble(struct symtable *sym)
 {
-    cglabel(Symtable[id].endlabel);
+    cglabel(sym->endlabel);
     fprintf(Outfile, "\taddq\t$%d,%%rsp\n", stackOffset);
     fputs("\tpopq	%rbp\n"
           "\tret\n",
@@ -183,54 +180,51 @@ int cgloadint(int value, int type)
 // Return the number of the register. If the
 // operation is pre- or post-increment/decrement,
 // also perform this action.
-int cgloadglob(int id, int op)
+int cgloadglob(struct symtable *sym, int op)
 {
     // Get a new register
     int r = alloc_register();
 
-    if (cgprimsize(Symtable[id].type) == 8)
+    if (cgprimsize(sym->type) == 8)
     {
         if (op == A_PREINC)
-            fprintf(Outfile, "\tincq\t%s(%%rip)\n", Symtable[id].name);
+            fprintf(Outfile, "\tincq\t%s(%%rip)\n", sym->name);
         if (op == A_PREDEC)
-            fprintf(Outfile, "\tdecq\t%s(%%rip)\n", Symtable[id].name);
-        fprintf(Outfile, "\tmovq\t%s(%%rip), %s\n", Symtable[id].name,
-                reglist[r]);
+            fprintf(Outfile, "\tdecq\t%s(%%rip)\n", sym->name);
+        fprintf(Outfile, "\tmovq\t%s(%%rip), %s\n", sym->name, reglist[r]);
         if (op == A_POSTINC)
-            fprintf(Outfile, "\tincq\t%s(%%rip)\n", Symtable[id].name);
+            fprintf(Outfile, "\tincq\t%s(%%rip)\n", sym->name);
         if (op == A_POSTDEC)
-            fprintf(Outfile, "\tdecq\t%s(%%rip)\n", Symtable[id].name);
+            fprintf(Outfile, "\tdecq\t%s(%%rip)\n", sym->name);
     }
     else
         // Print out the code to initialise it
-        switch (Symtable[id].type)
+        switch (sym->type)
         {
         case P_CHAR:
             if (op == A_PREINC)
-                fprintf(Outfile, "\tincb\t%s(%%rip)\n", Symtable[id].name);
+                fprintf(Outfile, "\tincb\t%s(%%rip)\n", sym->name);
             if (op == A_PREDEC)
-                fprintf(Outfile, "\tdecb\t%s(%%rip)\n", Symtable[id].name);
-            fprintf(Outfile, "\tmovzbq\t%s(%%rip), %s\n", Symtable[id].name,
-                    reglist[r]);
+                fprintf(Outfile, "\tdecb\t%s(%%rip)\n", sym->name);
+            fprintf(Outfile, "\tmovzbq\t%s(%%rip), %s\n", sym->name, reglist[r]);
             if (op == A_POSTINC)
-                fprintf(Outfile, "\tincb\t%s(%%rip)\n", Symtable[id].name);
+                fprintf(Outfile, "\tincb\t%s(%%rip)\n", sym->name);
             if (op == A_POSTDEC)
-                fprintf(Outfile, "\tdecb\t%s(%%rip)\n", Symtable[id].name);
+                fprintf(Outfile, "\tdecb\t%s(%%rip)\n", sym->name);
             break;
         case P_INT:
             if (op == A_PREINC)
-                fprintf(Outfile, "\tincl\t%s(%%rip)\n", Symtable[id].name);
+                fprintf(Outfile, "\tincl\t%s(%%rip)\n", sym->name);
             if (op == A_PREDEC)
-                fprintf(Outfile, "\tdecl\t%s(%%rip)\n", Symtable[id].name);
-            fprintf(Outfile, "\tmovslq\t%s(%%rip), %s\n", Symtable[id].name,
-                    reglist[r]);
+                fprintf(Outfile, "\tdecl\t%s(%%rip)\n", sym->name);
+            fprintf(Outfile, "\tmovslq\t%s(%%rip), %s\n", sym->name, reglist[r]);
             if (op == A_POSTINC)
-                fprintf(Outfile, "\tincl\t%s(%%rip)\n", Symtable[id].name);
+                fprintf(Outfile, "\tincl\t%s(%%rip)\n", sym->name);
             if (op == A_POSTDEC)
-                fprintf(Outfile, "\tdecl\t%s(%%rip)\n", Symtable[id].name);
+                fprintf(Outfile, "\tdecl\t%s(%%rip)\n", sym->name);
             break;
         default:
-            fatald("Bad type in cgloadglob:", Symtable[id].type);
+            fatald("Bad type in cgloadglob:", sym->type);
         }
     return (r);
 }
@@ -239,65 +233,62 @@ int cgloadglob(int id, int op)
 // Return the number of the register. If the
 // operation is pre- or post-increment/decrement,
 // also perform this action.
-int cgloadlocal(int id, int op)
+int cgloadlocal(struct symtable *sym, int op)
 {
     // Get a new register
     int r = alloc_register();
 
     // Print out the code to initialise it
-    if (cgprimsize(Symtable[id].type) == 8)
+    if (cgprimsize(sym->type) == 8)
     {
         if (op == A_PREINC)
-            fprintf(Outfile, "\tincq\t%d(%%rbp)\n", Symtable[id].posn);
+            fprintf(Outfile, "\tincq\t%d(%%rbp)\n", sym->posn);
         if (op == A_PREDEC)
-            fprintf(Outfile, "\tdecq\t%d(%%rbp)\n", Symtable[id].posn);
-        fprintf(Outfile, "\tmovq\t%d(%%rbp), %s\n", Symtable[id].posn,
-                reglist[r]);
+            fprintf(Outfile, "\tdecq\t%d(%%rbp)\n", sym->posn);
+        fprintf(Outfile, "\tmovq\t%d(%%rbp), %s\n", sym->posn, reglist[r]);
         if (op == A_POSTINC)
-            fprintf(Outfile, "\tincq\t%d(%%rbp)\n", Symtable[id].posn);
+            fprintf(Outfile, "\tincq\t%d(%%rbp)\n", sym->posn);
         if (op == A_POSTDEC)
-            fprintf(Outfile, "\tdecq\t%d(%%rbp)\n", Symtable[id].posn);
+            fprintf(Outfile, "\tdecq\t%d(%%rbp)\n", sym->posn);
     }
     else
-        switch (Symtable[id].type)
+        switch (sym->type)
         {
         case P_CHAR:
             if (op == A_PREINC)
-                fprintf(Outfile, "\tincb\t%d(%%rbp)\n", Symtable[id].posn);
+                fprintf(Outfile, "\tincb\t%d(%%rbp)\n", sym->posn);
             if (op == A_PREDEC)
-                fprintf(Outfile, "\tdecb\t%d(%%rbp)\n", Symtable[id].posn);
-            fprintf(Outfile, "\tmovzbq\t%d(%%rbp), %s\n", Symtable[id].posn,
-                    reglist[r]);
+                fprintf(Outfile, "\tdecb\t%d(%%rbp)\n", sym->posn);
+            fprintf(Outfile, "\tmovzbq\t%d(%%rbp), %s\n", sym->posn, reglist[r]);
             if (op == A_POSTINC)
-                fprintf(Outfile, "\tincb\t%d(%%rbp)\n", Symtable[id].posn);
+                fprintf(Outfile, "\tincb\t%d(%%rbp)\n", sym->posn);
             if (op == A_POSTDEC)
-                fprintf(Outfile, "\tdecb\t%d(%%rbp)\n", Symtable[id].posn);
+                fprintf(Outfile, "\tdecb\t%d(%%rbp)\n", sym->posn);
             break;
         case P_INT:
             if (op == A_PREINC)
-                fprintf(Outfile, "\tincl\t%d(%%rbp)\n", Symtable[id].posn);
+                fprintf(Outfile, "\tincl\t%d(%%rbp)\n", sym->posn);
             if (op == A_PREDEC)
-                fprintf(Outfile, "\tdecl\t%d(%%rbp)\n", Symtable[id].posn);
-            fprintf(Outfile, "\tmovslq\t%d(%%rbp), %s\n", Symtable[id].posn,
-                    reglist[r]);
+                fprintf(Outfile, "\tdecl\t%d(%%rbp)\n", sym->posn);
+            fprintf(Outfile, "\tmovslq\t%d(%%rbp), %s\n", sym->posn, reglist[r]);
             if (op == A_POSTINC)
-                fprintf(Outfile, "\tincl\t%d(%%rbp)\n", Symtable[id].posn);
+                fprintf(Outfile, "\tincl\t%d(%%rbp)\n", sym->posn);
             if (op == A_POSTDEC)
-                fprintf(Outfile, "\tdecl\t%d(%%rbp)\n", Symtable[id].posn);
+                fprintf(Outfile, "\tdecl\t%d(%%rbp)\n", sym->posn);
             break;
         default:
-            fatald("Bad type in cgloadlocal:", Symtable[id].type);
+            fatald("Bad type in cgloadlocal:", sym->type);
         }
     return (r);
 }
 
 // Given the label number of a global string,
 // load its address into a new register
-int cgloadglobstr(int id)
+int cgloadglobstr(int label)
 {
     // Get a new register
     int r = alloc_register();
-    fprintf(Outfile, "\tleaq\tL%d(%%rip), %s\n", id, reglist[r]);
+    fprintf(Outfile, "\tleaq\tL%d(%%rip), %s\n", label, reglist[r]);
     return (r);
 }
 
@@ -418,12 +409,12 @@ int cgboolean(int r, int op, int label)
 // Call a function with the given symbol id
 // Pop off any arguments pushed on the stack
 // Return the register with the result
-int cgcall(int id, int numargs)
+int cgcall(struct symtable *sym, int numargs)
 {
     // Get a new register
     int outr = alloc_register();
     // Call the function
-    fprintf(Outfile, "\tcall\t%s@PLT\n", Symtable[id].name);
+    fprintf(Outfile, "\tcall\t%s@PLT\n", sym->name);
     // Remove any arguments pushed on the stack
     if (numargs > 6)
         fprintf(Outfile, "\taddq\t$%d, %%rsp\n", 8 * (numargs - 6));
@@ -463,53 +454,47 @@ int cgshlconst(int r, int val)
 }
 
 // Store a register's value into a variable
-int cgstorglob(int r, int id)
+int cgstorglob(int r, struct symtable *sym)
 {
 
-    if (cgprimsize(Symtable[id].type) == 8)
+    if (cgprimsize(sym->type) == 8)
     {
-        fprintf(Outfile, "\tmovq\t%s, %s(%%rip)\n", reglist[r],
-                Symtable[id].name);
+        fprintf(Outfile, "\tmovq\t%s, %s(%%rip)\n", reglist[r], sym->name);
     }
     else
-        switch (Symtable[id].type)
+        switch (sym->type)
         {
         case P_CHAR:
-            fprintf(Outfile, "\tmovb\t%s, %s(%%rip)\n", breglist[r],
-                    Symtable[id].name);
+            fprintf(Outfile, "\tmovb\t%s, %s(%%rip)\n", breglist[r], sym->name);
             break;
         case P_INT:
-            fprintf(Outfile, "\tmovl\t%s, %s(%%rip)\n", dreglist[r],
-                    Symtable[id].name);
+            fprintf(Outfile, "\tmovl\t%s, %s(%%rip)\n", dreglist[r], sym->name);
             break;
         default:
-            fatald("Bad type in cgstorglob:", Symtable[id].type);
+            fatald("Bad type in cgstorglob:", sym->type);
         }
     return (r);
 }
 
 // Store a register's value into a local variable
-int cgstorlocal(int r, int id)
+int cgstorlocal(int r, struct symtable *sym)
 {
 
-    if (cgprimsize(Symtable[id].type) == 8)
+    if (cgprimsize(sym->type) == 8)
     {
-        fprintf(Outfile, "\tmovq\t%s, %d(%%rbp)\n", reglist[r],
-                Symtable[id].posn);
+        fprintf(Outfile, "\tmovq\t%s, %d(%%rbp)\n", reglist[r], sym->posn);
     }
     else
-        switch (Symtable[id].type)
+        switch (sym->type)
         {
         case P_CHAR:
-            fprintf(Outfile, "\tmovb\t%s, %d(%%rbp)\n", breglist[r],
-                    Symtable[id].posn);
+            fprintf(Outfile, "\tmovb\t%s, %d(%%rbp)\n", breglist[r], sym->posn);
             break;
         case P_INT:
-            fprintf(Outfile, "\tmovl\t%s, %d(%%rbp)\n", dreglist[r],
-                    Symtable[id].posn);
+            fprintf(Outfile, "\tmovl\t%s, %d(%%rbp)\n", dreglist[r], sym->posn);
             break;
         default:
-            fatald("Bad type in cgstorlocal:", Symtable[id].type);
+            fatald("Bad type in cgstorlocal:", sym->type);
         }
     return (r);
 }
@@ -535,23 +520,25 @@ int cgprimsize(int type)
 }
 
 // Generate a global symbol but not functions
-void cgglobsym(int id)
+void cgglobsym(struct symtable *node)
 {
     int typesize;
 
-    if (Symtable[id].stype == S_FUNCTION)
+    if (node == NULL)
+        return;
+    if (node->stype == S_FUNCTION)
         return;
 
     // Get the size of the type
-    typesize = cgprimsize(Symtable[id].type);
+    typesize = cgprimsize(node->type);
 
     // Generate the global identity and the label
     cgdataseg();
-    fprintf(Outfile, "\t.globl\t%s\n", Symtable[id].name);
-    fprintf(Outfile, "%s:", Symtable[id].name);
+    fprintf(Outfile, "\t.globl\t%s\n", node->name);
+    fprintf(Outfile, "%s:", node->name);
 
     // Generate the space
-    for (int i = 0; i < Symtable[id].size; i++)
+    for (int i = 0; i < node->size; i++)
     {
         switch (typesize)
         {
@@ -642,10 +629,10 @@ int cgwiden(int r, int oldtype, int newtype)
 }
 
 // Generate code to return a value from a function
-void cgreturn(int reg, int id)
+void cgreturn(int reg, struct symtable *sym)
 {
     // Generate code depending on the function's type
-    switch (Symtable[id].type)
+    switch (sym->type)
     {
     case P_CHAR:
         fprintf(Outfile, "\tmovzbl\t%s, %%eax\n", breglist[reg]);
@@ -657,23 +644,21 @@ void cgreturn(int reg, int id)
         fprintf(Outfile, "\tmovq\t%s, %%rax\n", reglist[reg]);
         break;
     default:
-        fatald("Bad function type in cgreturn:", Symtable[id].type);
+        fatald("Bad function type in cgreturn:", sym->type);
     }
-    cgjump(Symtable[id].endlabel);
+    cgjump(sym->endlabel);
 }
 
 // Generate code to load the address of an
 // identifier into a variable. Return a new register
-int cgaddress(int id)
+int cgaddress(struct symtable *sym)
 {
     int r = alloc_register();
 
-    if (Symtable[id].class == C_GLOBAL)
-        fprintf(Outfile, "\tleaq\t%s(%%rip), %s\n", Symtable[id].name,
-                reglist[r]);
+    if (sym->class == C_GLOBAL)
+        fprintf(Outfile, "\tleaq\t%s(%%rip), %s\n", sym->name, reglist[r]);
     else
-        fprintf(Outfile, "\tleaq\t%d(%%rbp), %s\n", Symtable[id].posn,
-                reglist[r]);
+        fprintf(Outfile, "\tleaq\t%d(%%rbp), %s\n", sym->posn, reglist[r]);
     return (r);
 }
 
