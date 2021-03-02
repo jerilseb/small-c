@@ -1,24 +1,16 @@
 int printf(char *fmt);
 
-char g;
+struct foo
+{
+    char y;
+    long z;
+} *var1;
 
-int add(int a, int b);
+struct foo var2;
 
 int main()
 {
     int x;
-    int y;
-
     x = 22;
-    y = add(x, 93);
-
-    printf("Hello world, %d\n", y);
-
     return (0);
-}
-
-int add(int a, int b) {
-    int result;
-    result = a + b;
-    return (result);
 }

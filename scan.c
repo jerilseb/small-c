@@ -195,6 +195,10 @@ static int keyword(char *s)
         if (!strcmp(s, "return"))
             return (T_RETURN);
         break;
+    case 's':
+        if (!strcmp(s, "struct"))
+            return (T_STRUCT);
+        break;
     case 'w':
         if (!strcmp(s, "while"))
             return (T_WHILE);

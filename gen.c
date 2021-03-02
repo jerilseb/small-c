@@ -312,3 +312,7 @@ int genprimsize(int type)
 {
     return (cgprimsize(type));
 }
+int genalign(int type, int offset, int direction)
+{
+    return (cgalign(type, offset, direction));
+}

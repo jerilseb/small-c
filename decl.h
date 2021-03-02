@@ -23,9 +23,12 @@ void genfreeregs();
 void genglobsym(struct symtable *node);
 int genglobstr(char *strvalue);
 int genprimsize(int type);
+int genalign(int type, int offset, int direction);
 void genreturn(int reg, int id);
 
 // cg.c
+int cgprimsize(int type);
+int cgalign(int type, int offset, int direction);
 void cgtextseg();
 void cgdataseg();
 void freeall_registers(void);
@@ -53,7 +56,6 @@ int cgcompare_and_jump(int ASTop, int r1, int r2, int label);
 void cglabel(int l);
 void cgjump(int l);
 int cgwiden(int r, int oldtype, int newtype);
-int cgprimsize(int type);
 void cgreturn(int reg, struct symtable *sym);
 int cgaddress(struct symtable *sym);
 int cgderef(int r, int type);
@@ -90,30 +92,31 @@ void fatalc(char *s, int c);
 // sym.c
 void appendsym(struct symtable **head, struct symtable **tail,
                struct symtable *node);
-struct symtable *newsym(char *name, int type, int stype, int class,
+struct symtable *newsym(char *name, int type, struct symtable *ctype, int stype, int class,
                         int size, int posn);
-struct symtable *addglob(char *name, int type, int stype,
-                         int class, int size);
-struct symtable *addlocl(char *name, int type, int stype,
-                         int class, int size);
-struct symtable *addparm(char *name, int type, int stype,
-                         int class, int size);
+struct symtable *addglob(char *name, int type, struct symtable *ctype, int stype, int size);
+struct symtable *addlocl(char *name, int type, struct symtable *ctype, int stype, int size);
+struct symtable *addparm(char *name, int type, struct symtable *ctype, int stype, int size);
+struct symtable *addstruct(char *name, int type, struct symtable *ctype, int stype, int size);
+struct symtable *addmemb(char *name, int type, struct symtable *ctype, int stype, int size);
 struct symtable *findglob(char *s);
 struct symtable *findlocl(char *s);
 struct symtable *findsymbol(char *s);
-struct symtable *findcomposite(char *s);
+struct symtable *findmember(char *s);
+struct symtable *findstruct(char *s);
 void clear_symtable(void);
 void freeloclsyms(void);
 
 // decl.c
-struct symtable *var_declaration(int type, int class);
+struct symtable *var_declaration(int type, struct symtable *ctype, int class);
 struct ASTnode *function_declaration(int type);
 void global_declarations(void);
 
 // types.c
 int inttype(int type);
 int ptrtype(int type);
-int parse_type(void);
+int parse_type(struct symtable **ctype);
 int pointer_to(int type);
 int value_at(int type);
+int typesize(int type, struct symtable *ctype);
 struct ASTnode *modify_type(struct ASTnode *tree, int rtype, int op);

@@ -25,12 +25,13 @@ void appendsym(struct symtable **head, struct symtable **tail,
 // Create a symbol node to be added to a symbol table list.
 // Set up the node's:
 // + type: char, int etc.
+// + ctype: composite type pointer for struct/union
 // + structural type: var, function, array etc.
 // + size: number of elements, or endlabel: end label for a function
 // + posn: Position information for local symbols
 // Return a pointer to the new node
-struct symtable *newsym(char *name, int type, int stype, int class,
-                        int size, int posn)
+struct symtable *newsym(char *name, int type, struct symtable *ctype,
+                        int stype, int class, int size, int posn)
 {
 
     // Get a new node
@@ -41,6 +42,7 @@ struct symtable *newsym(char *name, int type, int stype, int class,
     // Fill in the values
     node->name = strdup(name);
     node->type = type;
+    node->ctype = ctype;
     node->stype = stype;
     node->class = class;
     node->size = size;
@@ -55,26 +57,47 @@ struct symtable *newsym(char *name, int type, int stype, int class,
 }
 
 // Add a symbol to the global symbol list
-struct symtable *addglob(char *name, int type, int stype, int class, int size)
+struct symtable *addglob(char *name, int type, struct symtable *ctype,
+                         int stype, int size)
 {
-    struct symtable *sym = newsym(name, type, stype, class, size, 0);
+    struct symtable *sym = newsym(name, type, ctype, stype, C_GLOBAL, size, 0);
     appendsym(&Globhead, &Globtail, sym);
     return (sym);
 }
 
 // Add a symbol to the local symbol list
-struct symtable *addlocl(char *name, int type, int stype, int class, int size)
+struct symtable *addlocl(char *name, int type, struct symtable *ctype,
+                         int stype, int size)
 {
-    struct symtable *sym = newsym(name, type, stype, class, size, 0);
+    struct symtable *sym = newsym(name, type, ctype, stype, C_LOCAL, size, 0);
     appendsym(&Loclhead, &Locltail, sym);
     return (sym);
 }
 
 // Add a symbol to the parameter list
-struct symtable *addparm(char *name, int type, int stype, int class, int size)
+struct symtable *addparm(char *name, int type, struct symtable *ctype,
+                         int stype, int size)
 {
-    struct symtable *sym = newsym(name, type, stype, class, size, 0);
+    struct symtable *sym = newsym(name, type, ctype, stype, C_PARAM, size, 0);
     appendsym(&Parmhead, &Parmtail, sym);
+    return (sym);
+}
+
+// Add a symbol to the temporary member list
+struct symtable *addmemb(char *name, int type, struct symtable *ctype,
+                         int stype, int size)
+{
+    struct symtable *sym = newsym(name, type, ctype, stype, C_MEMBER, size, 0);
+    appendsym(&Membhead, &Membtail, sym);
+    return (sym);
+}
+
+// Add a struct to the struct list
+struct symtable *addstruct(char *name, int type, struct symtable *ctype,
+                           int stype, int size)
+{
+    struct symtable *sym = newsym(name, type, ctype, stype, C_STRUCT, size, 0);
+    appendsym(&Structhead, &Structtail, sym);
     return (sym);
 }
 
@@ -131,11 +154,18 @@ struct symtable *findsymbol(char *s)
     return (findsyminlist(s, Globhead));
 }
 
-// Find a composite type.
+// Find a member in the member list
 // Return a pointer to the found node or NULL if not found.
-struct symtable *findcomposite(char *s)
+struct symtable *findmember(char *s)
 {
-    return (findsyminlist(s, Comphead));
+    return (findsyminlist(s, Membhead));
+}
+
+// Find a struct in the struct list
+// Return a pointer to the found node or NULL if not found.
+struct symtable *findstruct(char *s)
+{
+    return (findsyminlist(s, Structhead));
 }
 
 // Reset the contents of the symbol table
@@ -144,7 +174,8 @@ void clear_symtable(void)
     Globhead = Globtail = NULL;
     Loclhead = Locltail = NULL;
     Parmhead = Parmtail = NULL;
-    Comphead = Comptail = NULL;
+    Membhead = Membtail = NULL;
+    Structhead = Structtail = NULL;
 }
 
 // Clear all the entries in the local symbol table
