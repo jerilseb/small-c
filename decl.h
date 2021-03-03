@@ -98,12 +98,14 @@ struct symtable *addglob(char *name, int type, struct symtable *ctype, int stype
 struct symtable *addlocl(char *name, int type, struct symtable *ctype, int stype, int size);
 struct symtable *addparm(char *name, int type, struct symtable *ctype, int stype, int size);
 struct symtable *addstruct(char *name, int type, struct symtable *ctype, int stype, int size);
+struct symtable *addunion(char *name, int type, struct symtable *ctype, int stype, int size);
 struct symtable *addmemb(char *name, int type, struct symtable *ctype, int stype, int size);
 struct symtable *findglob(char *s);
 struct symtable *findlocl(char *s);
 struct symtable *findsymbol(char *s);
 struct symtable *findmember(char *s);
 struct symtable *findstruct(char *s);
+struct symtable *findunion(char *s);
 void clear_symtable(void);
 void freeloclsyms(void);
 

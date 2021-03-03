@@ -116,7 +116,7 @@ static struct ASTnode *array_access(void)
     return (left);
 }
 
-// Parse the member reference of a struct (or union, soon)
+// Parse the member reference of a struct or union
 // and return an AST tree for it. If withpointer is true,
 // the access is through a pointer to the member.
 static struct ASTnode *member_access(int withpointer)
@@ -126,21 +126,21 @@ static struct ASTnode *member_access(int withpointer)
     struct symtable *typeptr;
     struct symtable *m;
 
-    // Check that the identifer has been declared as a struct (or a union, later),
-    // or a struct/union pointer
+    // Check that the identifer has been declared as a
+    // struct/union or a struct/union pointer
     if ((compvar = findsymbol(Text)) == NULL)
         fatals("Undeclared variable", Text);
-    if (withpointer && compvar->type != pointer_to(P_STRUCT))
+    if (withpointer && compvar->type != pointer_to(P_STRUCT) && compvar->type != pointer_to(P_UNION))
         fatals("Undeclared variable", Text);
-    if (!withpointer && compvar->type != P_STRUCT)
+    if (!withpointer && compvar->type != P_STRUCT && compvar->type != P_UNION)
         fatals("Undeclared variable", Text);
 
-    // If a pointer to a struct, get the pointer's value.
+    // If a pointer to a struct/union, get the pointer's value.
     // Otherwise, make a leaf node that points at the base
     // Either way, it's an rvalue
     if (withpointer)
     {
-        left = mkastleaf(A_IDENT, pointer_to(P_STRUCT), compvar, 0);
+        left = mkastleaf(A_IDENT, pointer_to(compvar->type), compvar, 0);
     }
     else
         left = mkastleaf(A_ADDR, compvar->type, compvar, 0);
@@ -165,8 +165,8 @@ static struct ASTnode *member_access(int withpointer)
     // Build an A_INTLIT node with the offset
     right = mkastleaf(A_INTLIT, P_INT, NULL, m->posn);
 
-    // Add the member's offset to the base of the struct and
-    // dereference it. Still an lvalue at this point
+    // Add the member's offset to the base of the struct/union
+    // and dereference it. Still an lvalue at this point
     left = mkastnode(A_ADD, pointer_to(m->type), left, NULL, right, NULL, 0);
     left = mkastunary(A_DEREF, m->type, left, NULL, 0);
     return (left);

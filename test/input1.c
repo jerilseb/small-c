@@ -1,20 +1,21 @@
 int printf(char *fmt);
 
-struct fred
+union fred
 {
+    char w;
     int x;
-    char y;
-    long z;
+    int y;
 };
 
-struct fred var2;
+union fred var1;
 
 int main()
 {
-    long result;
-    struct fred *varptr;
-
-    varptr->x = 12;
+    var1.x = 65;
+    printf("%d\n", var1.x);
+    var1.x = 66;
+    printf("%d\n", var1.x);
+    printf("%d\n", var1.y);
 
     return (0);
 }

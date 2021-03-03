@@ -57,6 +57,7 @@ static char *do_compile(char *filename)
                 strerror(errno));
         exit(1);
     }
+    setvbuf(Outfile, NULL, _IONBF, 0);
 
     Line = 1; // Reset the scanner
     Putback = '\n';

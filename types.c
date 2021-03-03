@@ -37,7 +37,7 @@ int value_at(int type)
 // the size of this type in bytes
 int typesize(int type, struct symtable *ctype)
 {
-    if (type == P_STRUCT)
+    if (type == P_STRUCT || type == P_UNION)
         return (ctype->size);
     return (genprimsize(type));
 }
@@ -56,9 +56,9 @@ struct ASTnode *modify_type(struct ASTnode *tree, int rtype, int op)
     ltype = tree->type;
 
     // XXX No idea on these yet
-    if (ltype == P_STRUCT)
+    if (ltype == P_STRUCT || ltype == P_UNION)
         fatal("Don't know how to do this yet");
-    if (rtype == P_STRUCT)
+    if (rtype == P_STRUCT || rtype == P_UNION)
         fatal("Don't know how to do this yet");
 
     // Compare scalar int types

@@ -57,6 +57,7 @@ enum
     T_FOR,
     T_RETURN,
     T_STRUCT,
+    T_UNION,
 
     // Structural tokens
     T_INTLIT,
@@ -136,7 +137,8 @@ enum
     P_CHAR = 32,
     P_INT = 48,
     P_LONG = 64,
-    P_STRUCT = 80
+    P_STRUCT = 80,
+    P_UNION = 96
 };
 
 // Structural types
@@ -154,6 +156,7 @@ enum
     C_LOCAL,      // Locally visible symbol
     C_PARAM,      // Locally visible function parameter
     C_STRUCT,     // A struct
+    C_UNION,      // A union
     C_MEMBER      // Member of a struct or union
 };
 
