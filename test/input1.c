@@ -1,21 +1,14 @@
 int printf(char *fmt);
 
-union fred
-{
-    char w;
-    int x;
-    int y;
-};
+enum fred { apple=1, banana, carrot, pear=10, peach, mango, papaya };
+enum jane { aple=1, bnana, crrot, par=10, pech, mago, paaya };
 
-union fred var1;
+enum fred var1;
+enum jane var2;
+enum fred var3;
 
-int main()
-{
-    var1.x = 65;
-    printf("%d\n", var1.x);
-    var1.x = 66;
-    printf("%d\n", var1.x);
-    printf("%d\n", var1.y);
-
-    return (0);
+int main() {
+  var1= carrot + pear + mango;
+  printf("%d\n", var1);
+  return(0);
 }

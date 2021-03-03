@@ -17,7 +17,9 @@ extern_ struct symtable *Loclhead, *Locltail;     // Local variables
 extern_ struct symtable *Parmhead, *Parmtail;     // Local parameters
 extern_ struct symtable *Membhead, *Membtail;     // Temp list of struct/union members
 extern_ struct symtable *Structhead, *Structtail; // List of struct types
-extern_ struct symtable *Unionhead, *Uniontail;   // List of struct types
+extern_ struct symtable *Unionhead, *Uniontail;   // List of union types
+extern_ struct symtable *Enumhead, *Enumtail;     // List of enum types and values
+extern_ struct symtable *Typehead, *Typetail;     // List of typedefs
 
 // Command-line flags
 extern_ int O_dumpAST;  // If true, dump the AST trees

@@ -110,13 +110,34 @@ struct symtable *addunion(char *name, int type, struct symtable *ctype,
     return (sym);
 }
 
+// Add an enum type or value to the enum list.
+// Class is C_ENUMTYPE or C_ENUMVAL.
+// Use posn to store the int value.
+struct symtable *addenum(char *name, int class, int value)
+{
+    struct symtable *sym = newsym(name, P_INT, NULL, 0, class, 0, value);
+    appendsym(&Enumhead, &Enumtail, sym);
+    return (sym);
+}
+
+// Add a typedef to the typedef list
+struct symtable *addtypedef(char *name, int type, struct symtable *ctype,
+                            int stype, int size)
+{
+    struct symtable *sym = newsym(name, type, ctype, stype, C_TYPEDEF, size, 0);
+    appendsym(&Typehead, &Typetail, sym);
+    return (sym);
+}
+
 // Search for a symbol in a specific list.
 // Return a pointer to the found node or NULL if not found.
-static struct symtable *findsyminlist(char *s, struct symtable *list)
+// If class is not zero, also match on the given class
+static struct symtable *findsyminlist(char *s, struct symtable *list, int class)
 {
     for (; list != NULL; list = list->next)
         if ((list->name != NULL) && !strcmp(s, list->name))
-            return (list);
+            if (class == 0 || class == list->class)
+                return (list);
     return (NULL);
 }
 
@@ -124,7 +145,7 @@ static struct symtable *findsyminlist(char *s, struct symtable *list)
 // Return a pointer to the found node or NULL if not found.
 struct symtable *findglob(char *s)
 {
-    return (findsyminlist(s, Globhead));
+    return (findsyminlist(s, Globhead, 0));
 }
 
 // Determine if the symbol s is in the local symbol table.
@@ -136,11 +157,11 @@ struct symtable *findlocl(char *s)
     // Look for a parameter if we are in a function's body
     if (Functionid)
     {
-        node = findsyminlist(s, Functionid->member);
+        node = findsyminlist(s, Functionid->member, 0);
         if (node)
             return (node);
     }
-    return (findsyminlist(s, Loclhead));
+    return (findsyminlist(s, Loclhead, 0));
 }
 
 // Determine if the symbol s is in the symbol table.
@@ -152,36 +173,57 @@ struct symtable *findsymbol(char *s)
     // Look for a parameter if we are in a function's body
     if (Functionid)
     {
-        node = findsyminlist(s, Functionid->member);
+        node = findsyminlist(s, Functionid->member, 0);
         if (node)
             return (node);
     }
     // Otherwise, try the local and global symbol lists
-    node = findsyminlist(s, Loclhead);
+    node = findsyminlist(s, Loclhead, 0);
     if (node)
         return (node);
-    return (findsyminlist(s, Globhead));
+    return (findsyminlist(s, Globhead, 0));
 }
 
 // Find a member in the member list
 // Return a pointer to the found node or NULL if not found.
 struct symtable *findmember(char *s)
 {
-    return (findsyminlist(s, Membhead));
+    return (findsyminlist(s, Membhead, 0));
 }
 
 // Find a struct in the struct list
 // Return a pointer to the found node or NULL if not found.
 struct symtable *findstruct(char *s)
 {
-    return (findsyminlist(s, Structhead));
+    return (findsyminlist(s, Structhead, 0));
 }
 
 // Find a struct in the union list
 // Return a pointer to the found node or NULL if not found.
 struct symtable *findunion(char *s)
 {
-    return (findsyminlist(s, Unionhead));
+    return (findsyminlist(s, Unionhead, 0));
+}
+
+// Find an enum type in the enum list
+// Return a pointer to the found node or NULL if not found.
+struct symtable *findenumtype(char *s)
+{
+    return (findsyminlist(s, Enumhead, C_ENUMTYPE));
+}
+
+// Find an enum value in the enum list
+// Return a pointer to the found node or NULL if not found.
+struct symtable *findenumval(char *s)
+{
+    return (findsyminlist(s, Enumhead, C_ENUMVAL));
+}
+
+// Find a type in the tyedef list
+// Return a pointer to the found node or NULL if not found.
+struct symtable *findtypedef(char *s)
+{
+    return (findsyminlist(s, Typehead, 0));
 }
 
 // Reset the contents of the symbol table
@@ -193,6 +235,8 @@ void clear_symtable(void)
     Membhead = Membtail = NULL;
     Structhead = Structtail = NULL;
     Unionhead = Uniontail = NULL;
+    Enumhead = Enumtail = NULL;
+    Typehead = Typetail = NULL;
 }
 
 // Clear all the entries in the local symbol table
