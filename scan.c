@@ -261,6 +261,10 @@ int scan(struct token *t)
         {
             t->token = T_DEC;
         }
+        else if (c == '>')
+        {
+            t->token = T_ARROW;
+        }
         else
         {
             putback(c);
@@ -302,6 +306,9 @@ int scan(struct token *t)
         break;
     case ',':
         t->token = T_COMMA;
+        break;
+    case '.':
+        t->token = T_DOT;
         break;
     case '=':
         if ((c = next()) == '=')

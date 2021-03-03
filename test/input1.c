@@ -1,16 +1,20 @@
 int printf(char *fmt);
 
-struct foo
+struct fred
 {
+    int x;
     char y;
     long z;
-} *var1;
+};
 
-struct foo var2;
+struct fred var2;
 
 int main()
 {
-    int x;
-    x = 22;
+    long result;
+    struct fred *varptr;
+
+    varptr->x = 12;
+
     return (0);
 }

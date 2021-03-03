@@ -69,7 +69,9 @@ enum
     T_RPAREN,
     T_LBRACKET,
     T_RBRACKET,
-    T_COMMA
+    T_COMMA,
+    T_DOT,
+    T_ARROW
 };
 
 // Token structure
@@ -174,8 +176,8 @@ struct symtable
         int posn;   // For locals, the negative offset
                     // from the stack base pointer
     };
-    struct symtable *member; // First member of a function, struct,
     struct symtable *next;   // Next symbol in one list
+    struct symtable *member; // First member of a function, struct,
 };                           // union or enum
 
 // Abstract Syntax Tree structure
