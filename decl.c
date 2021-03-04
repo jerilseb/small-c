@@ -546,6 +546,8 @@ void global_declarations(void)
             // A real function, generate the assembly code for it
             if (O_dumpAST)
             {
+                printf("-------%s-------\n\n", Infilename);
+
                 dumpAST(tree, NOLABEL, 0);
                 fprintf(stdout, "\n\n");
             }

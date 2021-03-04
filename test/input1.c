@@ -1,11 +1,12 @@
 #include <stdio.h>
 
-typedef int FOO;
+void run();
+
+extern int x;
 
 int main()
 {
-    FOO x;
-    x = 56;
+    run();
     printf("%d\n", x);
     return (0);
 }
