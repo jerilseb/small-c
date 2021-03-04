@@ -7,6 +7,7 @@ extern_ int Putback;                 // Character put back by scanner
 extern_ struct symtable *Functionid; // Symbol ptr of the current function
 extern_ FILE *Infile;                // Input and output files
 extern_ FILE *Outfile;
+extern_ char *Infilename;       // Name of file we are parsing
 extern_ char *Outfilename;      // Name of file we opened as Outfile
 extern_ struct token Token;     // Last token scanned
 extern_ char Text[TEXTLEN + 1]; // Last identifier scanned

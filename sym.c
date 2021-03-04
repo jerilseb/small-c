@@ -58,9 +58,9 @@ struct symtable *newsym(char *name, int type, struct symtable *ctype,
 
 // Add a symbol to the global symbol list
 struct symtable *addglob(char *name, int type, struct symtable *ctype,
-                         int stype, int size)
+                         int stype, int class, int size)
 {
-    struct symtable *sym = newsym(name, type, ctype, stype, C_GLOBAL, size, 0);
+    struct symtable *sym = newsym(name, type, ctype, stype, class, size, 0);
     appendsym(&Globhead, &Globtail, sym);
     return (sym);
 }

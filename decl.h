@@ -95,7 +95,7 @@ void appendsym(struct symtable **head, struct symtable **tail,
                struct symtable *node);
 struct symtable *newsym(char *name, int type, struct symtable *ctype, int stype, int class,
                         int size, int posn);
-struct symtable *addglob(char *name, int type, struct symtable *ctype, int stype, int size);
+struct symtable *addglob(char *name, int type, struct symtable *ctype, int stype, int class, int size);
 struct symtable *addlocl(char *name, int type, struct symtable *ctype, int stype, int size);
 struct symtable *addparm(char *name, int type, struct symtable *ctype, int stype, int size);
 struct symtable *addstruct(char *name, int type, struct symtable *ctype, int stype, int size);
@@ -123,7 +123,7 @@ void global_declarations(void);
 // types.c
 int inttype(int type);
 int ptrtype(int type);
-int parse_type(struct symtable **ctype);
+int parse_type(struct symtable **ctype, int *class);
 int pointer_to(int type);
 int value_at(int type);
 int typesize(int type, struct symtable *ctype);

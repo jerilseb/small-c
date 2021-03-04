@@ -169,22 +169,31 @@ static struct ASTnode *return_statement(void)
 // Parse a single statement and return its AST
 static struct ASTnode *single_statement(void)
 {
-    int type;
+    int type, class = C_LOCAL;
     struct symtable *ctype;
 
     switch (Token.token)
     {
+    case T_IDENT:
+        // We have to see if the identifier matches a typedef.
+        // If not do the default code in this switch statement.
+        // Otherwise, fall down to the parse_type() call.
+        if (findtypedef(Text) == NULL)
+            return (binexpr(0));
     case T_CHAR:
     case T_INT:
     case T_LONG:
-
+    case T_STRUCT:
+    case T_UNION:
+    case T_ENUM:
+    case T_TYPEDEF:
         // The beginning of a variable declaration.
         // Parse the type and get the identifier.
         // Then parse the rest of the declaration
         // and skip over the semicolon
-        type = parse_type(&ctype);
+        type = parse_type(&ctype, &class);
         ident();
-        var_declaration(type, ctype, C_LOCAL);
+        var_declaration(type, ctype, class);
         semi();
         return (NULL); // No AST generated here
     case T_IF:
