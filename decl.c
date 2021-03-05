@@ -294,7 +294,9 @@ struct ASTnode *function_declaration(int type)
     // Set the Functionid global to the function's symbol pointer
     Functionid = oldfuncsym;
 
-    // Get the AST tree for the compound statement
+    // Get the AST tree for the compound statement and mark
+    // that we have parsed no loops yet
+    Looplevel = 0;
     tree = compound_statement();
 
     // If the function type isn't P_VOID ..
@@ -546,12 +548,10 @@ void global_declarations(void)
             // A real function, generate the assembly code for it
             if (O_dumpAST)
             {
-                printf("-------%s-------\n\n", Infilename);
-
                 dumpAST(tree, NOLABEL, 0);
                 fprintf(stdout, "\n\n");
             }
-            genAST(tree, NOLABEL, 0);
+            genAST(tree, NOLABEL, NOLABEL, NOLABEL, 0);
 
             // Now free the symbols associated
             // with this function

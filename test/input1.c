@@ -1,12 +1,19 @@
 #include <stdio.h>
 
-void run();
-
-extern int x;
-
 int main()
 {
-    run();
-    printf("%d\n", x);
+    int x;
+    x = 0;
+    while (x < 25)
+    {
+        if (x == 5)
+        {
+            x = x + 3;
+            continue;
+        }
+        printf("%d\n", x);
+        x = x + 1;
+    }
+    printf("Done\n");
     return (0);
 }

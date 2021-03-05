@@ -3,47 +3,51 @@
 #include "decl.h"
 
 // Build and return a generic AST node
+// Build and return a generic AST node
 struct ASTnode *mkastnode(int op, int type,
-			  struct ASTnode *left,
-			  struct ASTnode *mid,
-			  struct ASTnode *right,
-			  struct symtable *sym, int intvalue) {
-  struct ASTnode *n;
+                          struct ASTnode *left,
+                          struct ASTnode *mid,
+                          struct ASTnode *right,
+                          struct symtable *sym, int intvalue)
+{
+    struct ASTnode *n;
 
-  // Malloc a new ASTnode
-  n = (struct ASTnode *) malloc(sizeof(struct ASTnode));
-  if (n == NULL)
-    fatal("Unable to malloc in mkastnode()");
+    // Malloc a new ASTnode
+    n = (struct ASTnode *)malloc(sizeof(struct ASTnode));
+    if (n == NULL)
+        fatal("Unable to malloc in mkastnode()");
 
-  // Copy in the field values and return it
-  n->op = op;
-  n->type = type;
-  n->left = left;
-  n->mid = mid;
-  n->right = right;
-  n->sym = sym;
-  n->intvalue = intvalue;
-  return (n);
+    // Copy in the field values and return it
+    n->op = op;
+    n->type = type;
+    n->left = left;
+    n->mid = mid;
+    n->right = right;
+    n->sym = sym;
+    n->intvalue = intvalue;
+    return (n);
 }
-
 
 // Make an AST leaf node
 struct ASTnode *mkastleaf(int op, int type,
-			  struct symtable *sym, int intvalue) {
-  return (mkastnode(op, type, NULL, NULL, NULL, sym, intvalue));
+                          struct symtable *sym, int intvalue)
+{
+    return (mkastnode(op, type, NULL, NULL, NULL, sym, intvalue));
 }
 
 // Make a unary AST node: only one child
 struct ASTnode *mkastunary(int op, int type, struct ASTnode *left,
-			    struct symtable *sym, int intvalue) {
-  return (mkastnode(op, type, left, NULL, NULL, sym, intvalue));
+                           struct symtable *sym, int intvalue)
+{
+    return (mkastnode(op, type, left, NULL, NULL, sym, intvalue));
 }
 
 // Generate and return a new label number
 // just for AST dumping purposes
-static int gendumplabel(void) {
-  static int id = 1;
-  return (id++);
+static int gendumplabel(void)
+{
+    static int id = 1;
+    return (id++);
 }
 
 // Given an AST tree, print it out and follow the
@@ -51,7 +55,6 @@ static int gendumplabel(void) {
 void dumpAST(struct ASTnode *n, int label, int level)
 {
     int Lfalse, Lstart, Lend;
-    int glueBreak = 0;
 
     switch (n->op)
     {
@@ -82,16 +85,16 @@ void dumpAST(struct ASTnode *n, int label, int level)
         return;
     }
 
-    // Reset level to -2 for A_GLUE
-    if (n->op == A_GLUE)
-        level = -2;
+    if(n->op == A_GLUE) {
+        level -= 2;
+    }
 
-    for (int i = 0; i < level; i++)
+    for (int i = 0; i < level; i++) {
         fprintf(stdout, "  ");
+    }
     switch (n->op)
     {
     case A_GLUE:
-        glueBreak = 1;
         break;
     case A_FUNCTION:
         fprintf(stdout, "A_FUNCTION %s\n\n", n->sym->name);
@@ -147,6 +150,12 @@ void dumpAST(struct ASTnode *n, int label, int level)
     case A_RETURN:
         fprintf(stdout, "A_RETURN\n");
         break;
+    case A_BREAK:
+        fprintf(stdout, "A_BREAK\n");
+        break;
+    case A_CONTINUE:
+        fprintf(stdout, "A_CONTINUE\n");
+        break;
     case A_FUNCCALL:
         fprintf(stdout, "A_FUNCCALL %s\n", n->sym->name);
         break;
@@ -191,13 +200,8 @@ void dumpAST(struct ASTnode *n, int label, int level)
     }
 
     // General AST node handling
-    if (n->left)
+    if (n->left) {
         dumpAST(n->left, NOLABEL, level + 2);
-
-    if (glueBreak == 1)
-    {
-        fprintf(stdout, "\n");
-        // glueBreak = 0;
     }
 
     if (n->right)

@@ -11,6 +11,7 @@ extern_ char *Infilename;       // Name of file we are parsing
 extern_ char *Outfilename;      // Name of file we opened as Outfile
 extern_ struct token Token;     // Last token scanned
 extern_ char Text[TEXTLEN + 1]; // Last identifier scanned
+extern_ int Looplevel;          // Depth of nested loops
 
 // Symbol table lists
 extern_ struct symtable *Globhead, *Globtail;     // Global variables and functions

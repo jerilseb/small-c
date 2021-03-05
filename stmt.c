@@ -78,8 +78,11 @@ static struct ASTnode *while_statement(void)
         condAST = mkastunary(A_TOBOOL, condAST->type, condAST, NULL, 0);
     rparen();
 
-    // Get the AST for the compound statement
+    // Get the AST for the compound statement.
+    // Update the loop depth in the process
+    Looplevel++;
     bodyAST = compound_statement();
+    Looplevel--;
 
     // Build and return the AST for this statement
     return (mkastnode(A_WHILE, P_NONE, condAST, NULL, bodyAST, NULL, 0));
@@ -120,7 +123,10 @@ static struct ASTnode *for_statement(void)
     rparen();
 
     // Get the compound statement which is the body
+    // Update the loop depth in the process
+    Looplevel++;
     bodyAST = compound_statement();
+    Looplevel--;
 
     // For now, all four sub-trees have to be non-NULL.
     // Later on, we'll change the semantics for when some are missing
@@ -166,6 +172,30 @@ static struct ASTnode *return_statement(void)
     return (tree);
 }
 
+// break_statement: 'break' ;
+//
+// Parse a break statement and return its AST
+static struct ASTnode *break_statement(void)
+{
+
+    if (Looplevel == 0)
+        fatal("no loop to break out from");
+    scan(&Token);
+    return (mkastleaf(A_BREAK, 0, NULL, 0));
+}
+
+// continue_statement: 'continue' ;
+//
+// Parse a continue statement and return its AST
+static struct ASTnode *continue_statement(void)
+{
+
+    if (Looplevel == 0)
+        fatal("no loop to continue to");
+    scan(&Token);
+    return (mkastleaf(A_CONTINUE, 0, NULL, 0));
+}
+
 // Parse a single statement and return its AST
 static struct ASTnode *single_statement(void)
 {
@@ -204,6 +234,10 @@ static struct ASTnode *single_statement(void)
         return (for_statement());
     case T_RETURN:
         return (return_statement());
+    case T_BREAK:
+        return (break_statement());
+    case T_CONTINUE:
+        return (continue_statement());
     default:
         // For now, see if this is an expression.
         // This catches assignment statements.
@@ -228,8 +262,7 @@ struct ASTnode *compound_statement(void)
         tree = single_statement();
 
         // Some statements must be followed by a semicolon
-        if (tree != NULL && (tree->op == A_ASSIGN ||
-                             tree->op == A_RETURN || tree->op == A_FUNCCALL))
+        if (tree != NULL && (tree->op == A_ASSIGN || tree->op == A_RETURN || tree->op == A_FUNCCALL || tree->op == A_BREAK || tree->op == A_CONTINUE))
             semi();
 
         // For each new tree, either save it in left

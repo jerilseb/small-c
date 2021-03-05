@@ -16,7 +16,8 @@ void dumpAST(struct ASTnode *n, int label, int parentASTop);
 
 // gen.c
 int genlabel(void);
-int genAST(struct ASTnode *n, int reg, int parentASTop);
+int genAST(struct ASTnode *n, int iflabel, int looptoplabel,
+           int loopendlabel, int parentASTop);
 void genpreamble();
 void genpostamble();
 void genfreeregs();
