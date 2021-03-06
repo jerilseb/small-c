@@ -206,6 +206,9 @@ void dumpAST(struct ASTnode *n, int label, int level)
     case A_SWITCH:
         fprintf(stdout, "A_SWITCH\n");
         return;
+    case A_CAST:
+        fprintf(stdout, "A_CAST %d\n", n->type);
+        return;
     default:
         fatald("Unknown dumpAST operator", n->op);
     }

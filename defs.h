@@ -140,7 +140,8 @@ enum
     A_CONTINUE,
     A_SWITCH,
     A_CASE,
-    A_DEFAULT
+    A_DEFAULT,
+    A_CAST
 };
 
 // Primitive types. The bottom 4 bits is an integer
@@ -188,17 +189,15 @@ struct symtable
     struct symtable *ctype; // If struct/union, ptr to that type
     int stype;              // Structural type for the symbol
     int class;              // Storage class for the symbol
+    int size;               // Total size in bytes of this symbol
+    int nelems;             // Functions: # params. Arrays: # elements
     union
     {
-        int size;     // Number of elements in the symbol
         int endlabel; // For functions, the end label
+        int posn;     // For locals, the negative offset
+                      // from the stack base pointer
     };
-    union
-    {
-        int nelems; // For functions, # of params
-        int posn;   // For locals, the negative offset
-                    // from the stack base pointer
-    };
+    int *initlist;           // List of initial values
     struct symtable *next;   // Next symbol in one list
     struct symtable *member; // First member of a function, struct,
 };                           // union or enum

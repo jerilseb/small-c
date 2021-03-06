@@ -1,24 +1,11 @@
-typedef int *bar;
-
-int x, **y;
+#include <stdio.h>
+char *y = (char *)0;
 
 int main()
 {
-    x = 0;
-    while (x < 100)
-    {
-        if (x == 5)
-        {
-            x = x + 2;
-            continue;
-        }
+    int x = 65535;
+    char y = (char)x;
 
-
-        if (x == 14)
-        {
-            break;
-        }
-        x = x + 1;
-    }
+    printf("0x%lx\n", (long)y);
     return (0);
 }

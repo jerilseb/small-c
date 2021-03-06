@@ -324,9 +324,9 @@ static struct ASTnode *single_statement(void)
     case T_ENUM:
     case T_TYPEDEF:
         // The beginning of a variable declaration list.
-        declaration_list(&ctype, C_LOCAL, T_SEMI, T_EOF);
+        declaration_list(&ctype, C_LOCAL, T_SEMI, T_EOF, &stmt);
         semi();
-        return (NULL); // No AST generated here
+        return (stmt); // Any assignments from the declarations
     case T_IF:
         return (if_statement());
     case T_WHILE:
