@@ -64,6 +64,9 @@ enum
     T_EXTERN,
     T_BREAK,
     T_CONTINUE,
+    T_SWITCH,
+    T_CASE,
+    T_DEFAULT,
 
     // Structural tokens
     T_INTLIT,
@@ -78,7 +81,8 @@ enum
     T_RBRACKET,
     T_COMMA,
     T_DOT,
-    T_ARROW
+    T_ARROW,
+    T_COLON
 };
 
 // Token structure
@@ -132,7 +136,10 @@ enum
     A_LOGNOT,
     A_TOBOOL,
     A_BREAK,
-    A_CONTINUE
+    A_CONTINUE,
+    A_SWITCH,
+    A_CASE,
+    A_DEFAULT
 };
 
 // Primitive types. The bottom 4 bits is an integer

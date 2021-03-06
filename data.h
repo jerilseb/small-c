@@ -12,6 +12,7 @@ extern_ char *Outfilename;      // Name of file we opened as Outfile
 extern_ struct token Token;     // Last token scanned
 extern_ char Text[TEXTLEN + 1]; // Last identifier scanned
 extern_ int Looplevel;          // Depth of nested loops
+extern_ int Switchlevel;        // Depth of nested switches
 
 // Symbol table lists
 extern_ struct symtable *Globhead, *Globtail;     // Global variables and functions

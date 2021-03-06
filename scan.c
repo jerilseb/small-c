@@ -198,10 +198,16 @@ static int keyword(char *s)
             return (T_BREAK);
         break;
     case 'c':
+        if (!strcmp(s, "case"))
+            return (T_CASE);
         if (!strcmp(s, "char"))
             return (T_CHAR);
         if (!strcmp(s, "continue"))
             return (T_CONTINUE);
+        break;
+    case 'd':
+        if (!strcmp(s, "default"))
+            return (T_DEFAULT);
         break;
     case 'e':
         if (!strcmp(s, "else"))
@@ -232,6 +238,8 @@ static int keyword(char *s)
     case 's':
         if (!strcmp(s, "struct"))
             return (T_STRUCT);
+        if (!strcmp(s, "switch"))
+            return (T_SWITCH);
         break;
     case 't':
         if (!strcmp(s, "typedef"))
@@ -351,6 +359,9 @@ int scan(struct token *t)
         break;
     case '.':
         t->token = T_DOT;
+        break;
+    case ':':
+        t->token = T_COLON;
         break;
     case '=':
         if ((c = next()) == '=')

@@ -85,11 +85,13 @@ void dumpAST(struct ASTnode *n, int label, int level)
         return;
     }
 
-    if(n->op == A_GLUE) {
+    if (n->op == A_GLUE)
+    {
         level -= 2;
     }
 
-    for (int i = 0; i < level; i++) {
+    for (int i = 0; i < level; i++)
+    {
         fprintf(stdout, "  ");
     }
     switch (n->op)
@@ -195,12 +197,22 @@ void dumpAST(struct ASTnode *n, int label, int level)
     case A_TOBOOL:
         fprintf(stdout, "A_TOBOOL\n");
         break;
+    case A_CASE:
+        fprintf(stdout, "A_CASE %d\n", n->intvalue);
+        return;
+    case A_DEFAULT:
+        fprintf(stdout, "A_DEFAULT\n");
+        return;
+    case A_SWITCH:
+        fprintf(stdout, "A_SWITCH\n");
+        return;
     default:
         fatald("Unknown dumpAST operator", n->op);
     }
 
     // General AST node handling
-    if (n->left) {
+    if (n->left)
+    {
         dumpAST(n->left, NOLABEL, level + 2);
     }
 

@@ -178,8 +178,8 @@ static struct ASTnode *return_statement(void)
 static struct ASTnode *break_statement(void)
 {
 
-    if (Looplevel == 0)
-        fatal("no loop to break out from");
+    if (Looplevel == 0 && Switchlevel == 0)
+        fatal("no loop or switch to break out from");
     scan(&Token);
     return (mkastleaf(A_BREAK, 0, NULL, 0));
 }
@@ -194,6 +194,105 @@ static struct ASTnode *continue_statement(void)
         fatal("no loop to continue to");
     scan(&Token);
     return (mkastleaf(A_CONTINUE, 0, NULL, 0));
+}
+
+// Parse a switch statement and return its AST
+static struct ASTnode *switch_statement(void)
+{
+    struct ASTnode *left, *n, *c, *casetree = NULL, *casetail;
+    int inloop = 1, casecount = 0;
+    int seendefault = 0;
+    int ASTop, casevalue;
+
+    // Skip the 'switch' and '('
+    scan(&Token);
+    lparen();
+
+    // Get the switch expression, the ')' and the '{'
+    left = binexpr(0);
+    rparen();
+    lbrace();
+
+    // Ensure that this is of int type
+    if (!inttype(left->type))
+        fatal("Switch expression is not of integer type");
+
+    // Build an A_SWITCH subtree with the expression as
+    // the child
+    n = mkastunary(A_SWITCH, 0, left, NULL, 0);
+
+    // Now parse the cases
+    Switchlevel++;
+    while (inloop)
+    {
+        switch (Token.token)
+        {
+        // Leave the loop when we hit a '}'
+        case T_RBRACE:
+            if (casecount == 0)
+                fatal("No cases in switch");
+            inloop = 0;
+            break;
+        case T_CASE:
+        case T_DEFAULT:
+            // Ensure this isn't after a previous 'default'
+            if (seendefault)
+                fatal("case or default after existing default");
+
+            // Set the AST operation. Scan the case value if required
+            if (Token.token == T_DEFAULT)
+            {
+                ASTop = A_DEFAULT;
+                seendefault = 1;
+                scan(&Token);
+            }
+            else
+            {
+                ASTop = A_CASE;
+                scan(&Token);
+                left = binexpr(0);
+                // Ensure the case value is an integer literal
+                if (left->op != A_INTLIT)
+                    fatal("Expecting integer literal for case value");
+                casevalue = left->intvalue;
+
+                // Walk the list of existing case values to ensure
+                // that there isn't a duplicate case value
+                for (c = casetree; c != NULL; c = c->right)
+                    if (casevalue == c->intvalue)
+                        fatal("Duplicate case value");
+            }
+
+            // Scan the ':' and get the compound expression
+            match(T_COLON, ":");
+            left = compound_statement();
+            casecount++;
+
+            // Build a sub-tree with the compound statement as the left child
+            // and link it in to the growing A_CASE tree
+            if (casetree == NULL)
+            {
+                casetree = casetail = mkastunary(ASTop, 0, left, NULL, casevalue);
+            }
+            else
+            {
+                casetail->right = mkastunary(ASTop, 0, left, NULL, casevalue);
+                casetail = casetail->right;
+            }
+            break;
+        default:
+            fatald("Unexpected token in switch", Token.token);
+        }
+    }
+    Switchlevel--;
+
+    // We have a sub-tree with the cases and any default. Put the
+    // case count into the A_SWITCH node and attach the case tree.
+    n->intvalue = casecount;
+    n->right = casetree;
+    rbrace();
+
+    return (n);
 }
 
 // Parse a single statement and return its AST
@@ -238,6 +337,8 @@ static struct ASTnode *single_statement(void)
         return (break_statement());
     case T_CONTINUE:
         return (continue_statement());
+    case T_SWITCH:
+        return (switch_statement());
     default:
         // For now, see if this is an expression.
         // This catches assignment statements.

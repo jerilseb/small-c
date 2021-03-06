@@ -295,8 +295,9 @@ struct ASTnode *function_declaration(int type)
     Functionid = oldfuncsym;
 
     // Get the AST tree for the compound statement and mark
-    // that we have parsed no loops yet
+    // that we have parsed no loops or switches yet
     Looplevel = 0;
+    Switchlevel = 0;
     tree = compound_statement();
 
     // If the function type isn't P_VOID ..
