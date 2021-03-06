@@ -79,7 +79,7 @@ int parse_type(struct symtable **ctype, int *class)
         type = type_of_typedef(Text, ctype);
         break;
     default:
-        fatald("Illegal type, token", Token.token);
+        fatals("Illegal type, token", Token.tokstr);
     }
 
     // Scan in one or more further '*' tokens
@@ -225,7 +225,7 @@ static int var_declaration_list(struct symtable *funcsym, int class,
 
         // Must have a separate_token or ')' at this point
         if ((Token.token != separate_token) && (Token.token != end_token))
-            fatald("Unexpected token in parameter list", Token.token);
+            fatals("Unexpected token in parameter list", Token.tokstr);
         if (Token.token == separate_token)
             scan(&Token);
     }
@@ -298,7 +298,9 @@ struct ASTnode *function_declaration(int type)
     // that we have parsed no loops or switches yet
     Looplevel = 0;
     Switchlevel = 0;
-    tree = compound_statement();
+    lbrace();
+    tree = compound_statement(0);
+    rbrace();
 
     // If the function type isn't P_VOID ..
     if (type != P_VOID)

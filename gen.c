@@ -190,9 +190,11 @@ int genAST(struct ASTnode *n, int iflabel, int looptoplabel,
     case A_GLUE:
         // Do each child statement, and free the
         // registers after each child
-        genAST(n->left, iflabel, looptoplabel, loopendlabel, n->op);
+        if (n->left != NULL)
+            genAST(n->left, iflabel, looptoplabel, loopendlabel, n->op);
         genfreeregs();
-        genAST(n->right, iflabel, looptoplabel, loopendlabel, n->op);
+        if (n->right != NULL)
+            genAST(n->right, iflabel, looptoplabel, loopendlabel, n->op);
         genfreeregs();
         return (NOREG);
     case A_FUNCTION:

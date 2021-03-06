@@ -13,14 +13,14 @@
 // child being the next expression. Each A_GLUE node will have size field
 // set to the number of expressions in the tree at this point. If no
 // expressions are parsed, NULL is returned
-static struct ASTnode *expression_list(void)
+struct ASTnode *expression_list(int endtoken)
 {
     struct ASTnode *tree = NULL;
     struct ASTnode *child = NULL;
     int exprcount = 0;
 
-    // Loop until the final right parentheses
-    while (Token.token != T_RPAREN)
+    // Loop until the end token
+    while (Token.token != endtoken)
     {
 
         // Parse the next expression and increment the expression count
@@ -31,17 +31,12 @@ static struct ASTnode *expression_list(void)
         // and the new expression as the right child. Store the expression count.
         tree = mkastnode(A_GLUE, P_NONE, tree, NULL, child, NULL, exprcount);
 
-        // Must have a ',' or ')' at this point
-        switch (Token.token)
-        {
-        case T_COMMA:
-            scan(&Token);
+        // Stop when we reach the end token
+        if (Token.token == endtoken)
             break;
-        case T_RPAREN:
-            break;
-        default:
-            fatald("Unexpected token in expression list", Token.token);
-        }
+
+        // Must have a ',' at this point
+        match(T_COMMA, ",");
     }
 
     // Return the tree of expressions
@@ -64,7 +59,7 @@ static struct ASTnode *funccall(void)
     lparen();
 
     // Parse the argument expression list
-    tree = expression_list();
+    tree = expression_list(T_RPAREN);
 
     // XXX Check type of each argument against the function's prototype
 
@@ -267,7 +262,7 @@ static struct ASTnode *primary(void)
         return (n);
 
     default:
-        fatald("Expecting a primary expression, got token", Token.token);
+        fatals("Expecting a primary expression, got token", Token.tokstr);
     }
 
     // Scan in the next token and return the leaf node

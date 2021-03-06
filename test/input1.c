@@ -3,33 +3,23 @@
 int main()
 {
     int x;
-    int y;
-    y = 0;
-
-    for (x = 0; x < 5; x++)
+    x = 0;
+    while (x < 100)
     {
-        switch (x)
+        if (x == 5)
         {
-            case 1:
-            {
-                y = 5;
-                break;
-            }
-            case 2:
-            {
-                y = 7;
-                break;
-            }
-            case 3:
-            {
-                y = 9;
-            }
-            default:
-            {
-                y = 100;
-            }
+            x = x + 2;
+            continue;
         }
-        printf("%d\n", y);
+
+        printf("%d\n", x);
+
+        if (x == 14)
+        {
+            break;
+        }
+        x = x + 1;
     }
+    printf("Done\n");
     return (0);
 }
