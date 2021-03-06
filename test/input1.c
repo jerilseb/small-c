@@ -1,8 +1,9 @@
-#include <stdio.h>
+typedef int *bar;
+
+int x, **y;
 
 int main()
 {
-    int x;
     x = 0;
     while (x < 100)
     {
@@ -12,7 +13,6 @@ int main()
             continue;
         }
 
-        printf("%d\n", x);
 
         if (x == 14)
         {
@@ -20,6 +20,5 @@ int main()
         }
         x = x + 1;
     }
-    printf("Done\n");
     return (0);
 }

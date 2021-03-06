@@ -295,9 +295,8 @@ static struct ASTnode *switch_statement(void)
 // Parse a single statement and return its AST.
 static struct ASTnode *single_statement(void)
 {
-    int type, class = C_LOCAL;
-    struct symtable *ctype;
     struct ASTnode *stmt;
+    struct symtable *ctype;
 
     switch (Token.token)
     {
@@ -324,13 +323,8 @@ static struct ASTnode *single_statement(void)
     case T_UNION:
     case T_ENUM:
     case T_TYPEDEF:
-        // The beginning of a variable declaration.
-        // Parse the type and get the identifier.
-        // Then parse the rest of the declaration
-        // and skip over the semicolon
-        type = parse_type(&ctype, &class);
-        ident();
-        var_declaration(type, ctype, class);
+        // The beginning of a variable declaration list.
+        declaration_list(&ctype, C_LOCAL, T_SEMI, T_EOF);
         semi();
         return (NULL); // No AST generated here
     case T_IF:
